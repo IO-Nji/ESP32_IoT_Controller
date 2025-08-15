@@ -57,6 +57,7 @@ void setup() {
   Wire.begin();
   display1.begin(SSD1306_SWITCHCAPVCC, SCREEN1_ADDR);
   display2.begin(SSD1306_SWITCHCAPVCC, SCREEN2_ADDR);
+  display1.setRotation(3); // Set vertical orientation for 128x32 display
   display1.clearDisplay();
   display2.clearDisplay();
   pinMode(BUTTON1_PIN, INPUT_PULLUP);
