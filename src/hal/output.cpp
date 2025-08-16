@@ -1,6 +1,9 @@
 #include "output.h"
 #include "hal_config.h"
 
+// No need to include ESP32-specific headers here
+// We'll use a platform-independent approach
+
 // Define output hardware objects internally to the HAL
 static Adafruit_NeoPixel leds(NUM_LEDS, LED_PIN, NEO_GRB + NEO_KHZ800);
 
@@ -26,23 +29,20 @@ void hal_output_set_buzzer(bool on) {
 }
 
 void hal_output_set_buzzer_duty(uint8_t duty_cycle) {
-    // Using PWM to control buzzer
-    // ESP32 has ledc functions for PWM
-    ledcAttachPin(BUZZER_PIN, 0); // Channel 0
-    ledcSetup(0, 5000, 8);        // 5 kHz, 8-bit resolution
-    ledcWrite(0, duty_cycle);
+    // Using analogWrite which works on most Arduino platforms
+    // For ESP32, this will be mapped to the appropriate PWM function
+    analogWrite(BUZZER_PIN, duty_cycle);
 }
 
 void hal_output_play_tone(unsigned int frequency, unsigned long duration) {
-    // Use ESP32's tone generation
-    ledcAttachPin(BUZZER_PIN, 0);
-    ledcSetup(0, frequency, 8);
-    ledcWrite(0, 128); // 50% duty cycle
+    // Use generic Arduino tone function
+    // This works on most platforms including ESP32 with the Arduino framework
+    tone(BUZZER_PIN, frequency, duration);
     
     // If duration is 0, tone runs until stopped
     if (duration > 0) {
         delay(duration);
-        ledcWrite(0, 0);
+        noTone(BUZZER_PIN);
     }
 }
 

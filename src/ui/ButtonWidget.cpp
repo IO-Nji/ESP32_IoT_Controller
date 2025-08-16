@@ -14,15 +14,8 @@ void ButtonWidget::draw(Adafruit_GFX& display) {
     }
     
     // Calculate absolute coordinates if we have a parent
-    int16_t absX = x;
-    int16_t absY = y;
-    const Widget* currentParent = parent;
-    
-    while (currentParent) {
-        absX += currentParent->x;
-        absY += currentParent->y;
-        currentParent = currentParent->parent;
-    }
+    int16_t absX, absY;
+    getAbsolutePosition(absX, absY);
     
     // Draw button based on state
     switch (state) {
@@ -32,7 +25,7 @@ void ButtonWidget::draw(Adafruit_GFX& display) {
             display.setTextColor(0); // Black text
             break;
             
-        case State::DISABLED:
+        case State::INACTIVE:
             // Draw border with dashed line for disabled state
             for (int16_t i = 0; i < width; i += 2) {
                 display.drawPixel(absX + i, absY, 1);
@@ -71,7 +64,7 @@ void ButtonWidget::draw(Adafruit_GFX& display) {
 
 bool ButtonWidget::handleInput(uint8_t eventType, int32_t eventData) {
     // Only process events if button is enabled
-    if (state == State::DISABLED || !isVisible()) {
+    if (state == State::INACTIVE || !isVisible()) {
         return false;
     }
     
@@ -92,7 +85,7 @@ bool ButtonWidget::handleInput(uint8_t eventType, int32_t eventData) {
             
             // Execute callback if set
             if (onPressCallback) {
-                onPressCallback();
+                onPressCallback(this);
             }
             
             return true;
@@ -118,6 +111,18 @@ ButtonWidget::State ButtonWidget::getState() const {
     return state;
 }
 
-void ButtonWidget::setOnPressCallback(void (*callback)()) {
+void ButtonWidget::setOnPressCallback(void (*callback)(ButtonWidget*)) {
     onPressCallback = callback;
+}
+
+void ButtonWidget::simulatePress() {
+    // First set to pressed state
+    setState(State::PRESSED);
+    
+    // Then trigger the callback and return to normal state
+    if (onPressCallback) {
+        onPressCallback(this);
+    }
+    
+    setState(State::NORMAL);
 }

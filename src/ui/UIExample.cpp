@@ -1,5 +1,16 @@
 #include "UIExample.h"
 
+// Button callbacks implementation
+void exampleButton1Callback(ButtonWidget* button) {
+    // Example implementation for button 1
+    Serial.println("Button 1 pressed");
+}
+
+void exampleButton2Callback(ButtonWidget* button) {
+    // Example implementation for button 2
+    Serial.println("Button 2 pressed");
+}
+
 // Initialize static members
 unsigned long UIExample::lastUpdateTime = 0;
 int UIExample::counterValue = 0;
@@ -27,7 +38,7 @@ void UIExample::setup() {
         
         // Button at bottom
         ButtonWidget* menuButton = new ButtonWidget(4, 100, 24, 20, "MENU");
-        menuButton->setOnPressCallback(onButton1Pressed);
+        menuButton->setOnPressCallback(exampleButton1Callback);
         screen1->addWidget(menuButton);
     }
     
@@ -44,11 +55,11 @@ void UIExample::setup() {
         
         // Buttons at bottom
         ButtonWidget* button1 = new ButtonWidget(10, 44, 50, 16, "BTN 1");
-        button1->setOnPressCallback(onButton1Pressed);
+        button1->setOnPressCallback(exampleButton1Callback);
         screen2->addWidget(button1);
         
         ButtonWidget* button2 = new ButtonWidget(68, 44, 50, 16, "BTN 2");
-        button2->setOnPressCallback(onButton2Pressed);
+        button2->setOnPressCallback(exampleButton2Callback);
         screen2->addWidget(button2);
     }
     
@@ -76,7 +87,8 @@ void UIExample::update() {
         if (screen1) {
             // Find the value label and update it
             for (auto widget : screen1->getWidgets()) {
-                LabelWidget* label = dynamic_cast<LabelWidget*>(widget);
+                LabelWidget* label = static_cast<LabelWidget*>(widget);
+                // Check if this is the right label by comparing Y position
                 if (label && label->getY() == 40) {
                     label->setText(String(counterValue));
                     break;

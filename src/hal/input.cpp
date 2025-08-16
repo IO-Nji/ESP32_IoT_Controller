@@ -2,7 +2,12 @@
 #include "hal_config.h"
 
 // Define input hardware objects internally to the HAL
-static char keys[KEYPAD_ROWS][KEYPAD_COLS] = KEYPAD_KEYS;
+static char keys[KEYPAD_ROWS][KEYPAD_COLS] = {
+    {'1','2','3','A'},
+    {'4','5','6','B'},
+    {'7','8','9','C'},
+    {'*','0','#','D'}
+};
 static Keypad keypad = Keypad(makeKeymap(keys), const_cast<uint8_t*>(KEYPAD_ROW_PINS), 
                             const_cast<uint8_t*>(KEYPAD_COL_PINS), KEYPAD_ROWS, KEYPAD_COLS);
 static Encoder rotaryEncoder(ENCODER_SW1_PIN, ENCODER_SW2_PIN);

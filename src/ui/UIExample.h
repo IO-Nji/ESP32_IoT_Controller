@@ -5,6 +5,10 @@
 #include <Adafruit_SSD1306.h>
 #include "UIFramework.h"
 
+// Forward declarations for button callbacks
+void exampleButton1Callback(ButtonWidget* button);
+void exampleButton2Callback(ButtonWidget* button);
+
 /**
  * @brief Example usage of the UI Framework
  * 

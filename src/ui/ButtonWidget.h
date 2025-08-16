@@ -17,7 +17,7 @@ public:
     enum class State {
         NORMAL,     ///< Default state
         PRESSED,    ///< Button is currently pressed
-        DISABLED    ///< Button is disabled and cannot be pressed
+        INACTIVE    ///< Button is disabled and cannot be pressed
     };
     
     /**
@@ -85,12 +85,19 @@ public:
      * 
      * @param callback Function to call when button is pressed
      */
-    void setOnPressCallback(void (*callback)());
+    void setOnPressCallback(void (*callback)(ButtonWidget*));
+
+    /**
+     * @brief Simulate a button press from code
+     * 
+     * This method allows triggering button press programmatically
+     */
+    void simulatePress();
 
 private:
-    String label;              ///< Button label text
-    State state;               ///< Current button state
-    void (*onPressCallback)(); ///< Callback function for press events
+    String label;                          ///< Button label text
+    State state;                           ///< Current button state
+    void (*onPressCallback)(ButtonWidget*); ///< Callback function for press events
 };
 
 #endif // BUTTON_WIDGET_H

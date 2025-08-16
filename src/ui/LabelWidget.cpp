@@ -16,19 +16,11 @@ void LabelWidget::draw(Adafruit_GFX& display) {
     }
     
     // Calculate absolute coordinates if we have a parent
-    int16_t absX = x;
-    int16_t absY = y;
-    const Widget* currentParent = parent;
+    int16_t absX, absY;
+    getAbsolutePosition(absX, absY);
     
-    while (currentParent) {
-        absX += currentParent->x;
-        absY += currentParent->y;
-        currentParent = currentParent->parent;
-    }
-    
-    // Save current text properties
-    uint8_t prevTextSize = display.getTextSize();
-    uint16_t prevTextColor = display.getTextColor();
+    // Save current text properties - Adafruit_GFX doesn't have getters, so we'll just set and not restore
+    // No need to save previous values
     
     // Set text properties
     display.setTextSize(textSize);
@@ -64,9 +56,8 @@ void LabelWidget::draw(Adafruit_GFX& display) {
     display.setCursor(textX, textY);
     display.print(text);
     
-    // Restore previous text properties
-    display.setTextSize(prevTextSize);
-    display.setTextColor(prevTextColor);
+    // No need to restore text properties as we don't have a way to get the previous values
+    // The parent widget or next drawing operation should set its own text properties
 }
 
 void LabelWidget::setText(const String& text) {

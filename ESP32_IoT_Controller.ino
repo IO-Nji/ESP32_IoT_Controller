@@ -9,6 +9,46 @@
 // Include the UI framework
 #include "src/ui/UIFramework.h"
 
+// UI Manager instance to control both displays
+UIManager* uiManager;
+
+// Screen IDs for different screens
+#define MAIN_SCREEN_ID 0
+
+// AppTitleWidget for Display 1 (vertical 128x32)
+AppTitleWidget* appTitle;
+
+// Initialize the UI widgets and screens
+void initUI() {
+  // Get raw display objects from HAL
+  Adafruit_SSD1306* display1 = hal_display_get_display1();
+  Adafruit_SSD1306* display2 = hal_display_get_display2();
+  
+  // Create UI manager with both displays
+  uiManager = new UIManager(*display1, *display2);
+  
+  // Create screens for each display
+  Screen* mainScreen1 = uiManager->createScreen(0, MAIN_SCREEN_ID); // Display 1, Main Screen
+  Screen* mainScreen2 = uiManager->createScreen(1, MAIN_SCREEN_ID); // Display 2, Main Screen
+  
+  // Create AppTitleWidget for Display 1 (vertical 32x128)
+  // The widget will display "ESP32 IOT" and an abbreviated "EI" below it
+  appTitle = new AppTitleWidget(0, 10, 32, 50, "ESP32 IOT");
+  
+  // Add widget to screen 1
+  mainScreen1->addWidget(appTitle);
+  
+  // Create a simple label for Display 2 to show it's working
+  LabelWidget* infoLabel = new LabelWidget(0, 25, 128, 16, "AppTitleWidget Demo", 1, LabelWidget::Alignment::CENTER);
+  
+  // Add widget to screen 2
+  mainScreen2->addWidget(infoLabel);
+  
+  // Activate the main screens
+  uiManager->setActiveScreen(0, MAIN_SCREEN_ID);
+  uiManager->setActiveScreen(1, MAIN_SCREEN_ID);
+}
+
 void setup() {
   // Serial for debugging
   Serial.begin(115200);
@@ -22,7 +62,7 @@ void setup() {
     Serial.println("Failed to initialize MPU6050 sensor");
   }
   
-  // Display a startup message
+  // Display a startup message directly with HAL
   hal_display_clear(0);
   hal_display_draw_text(0, "ESP32", 0, 0, 1);
   hal_display_draw_text(0, "Controller", 0, 10, 1);
@@ -42,102 +82,93 @@ void setup() {
     delay(100);
   }
   
+  // Initialize UI components
+  initUI();
+  
   Serial.println("Initialization complete");
 }
 
-// Demo variables using HAL
-long lastEncoder = 0;
-uint8_t ledHue = 0;
-uint8_t ledBrightness = 128;
-unsigned long lastUpdateTime = 0;
-
-void loop() {
-  unsigned long currentTime = millis();
-  unsigned long deltaTime = currentTime - lastUpdateTime;
+// Demo function to update the app title periodically
+void updateAppTitle() {
+  // Titles to cycle through for demonstration
+  static const char* titles[] = {
+    "ESP32 IOT", 
+    "DASHBOARD", 
+    "SETTINGS", 
+    "SENSOR DATA"
+  };
+  static uint8_t titleIndex = 0;
+  static unsigned long lastTitleChange = 0;
   
-  // Update only every 50ms to avoid excessive processing
-  if (deltaTime >= 50) {
-    lastUpdateTime = currentTime;
+  // Change title every 3 seconds
+  if (millis() - lastTitleChange > 3000) {
+    titleIndex = (titleIndex + 1) % 4;
+    appTitle->setTitle(titles[titleIndex]);
     
-    // Read encoder through HAL
-    long encoder = hal_input_read_encoder();
-    if (encoder != lastEncoder) {
-      ledHue = (encoder % 256);
-      lastEncoder = encoder;
-    }
-  
-    // Read keypad through HAL
-    char key = hal_input_read_keypad();
-    if (key) {
-      if (key == '1') ledBrightness = 32;
-      else if (key == '2') ledBrightness = 64;
-      else if (key == '3') ledBrightness = 128;
-      else if (key == '4') ledBrightness = 255;
-      
-      // Beep buzzer on keypress
-      hal_output_set_buzzer(true);
-      delay(50);
-      hal_output_set_buzzer(false);
-    }
-  
-    // Update LEDs through HAL
-    for (int i = 0; i < 6; i++) {
-      hal_output_set_led_hsv(i, (ledHue + i * 20) * 256, 255, ledBrightness);
-    }
-    hal_output_update_leds();
-  
-    // Update sensor data
-    hal_sensor_update();
+    // Provide feedback
+    hal_output_set_buzzer(true);
+    delay(50);
+    hal_output_set_buzzer(false);
     
-    // Update displays
-    updateDisplays();
+    lastTitleChange = millis();
   }
 }
 
-void updateDisplays() {
-  // Display 1 (small vertical display)
-  hal_display_clear(0);
+// Process user input for UI interactions
+void processInput() {
+  // Handle physical button inputs
+  bool button1State = hal_input_read_button(1);
+  bool button2State = hal_input_read_button(2);
   
-  // Draw encoder value
-  hal_display_draw_text(0, "Enc:", 0, 0, 1);
-  hal_display_draw_text(0, String(lastEncoder).c_str(), 0, 10, 1);
+  // Use buttons for LED color effects
+  static uint8_t ledHue = 0;
   
-  // Draw pot value
-  int potValue = hal_input_read_pot();
-  hal_display_draw_text(0, "Pot:", 0, 30, 1);
-  hal_display_draw_text(0, String(potValue).c_str(), 0, 40, 1);
+  if (button1State) {
+    ledHue = (ledHue + 10) % 256;
+    
+    // Provide feedback
+    hal_output_set_buzzer(true);
+    delay(50);
+    hal_output_set_buzzer(false);
+  }
   
-  // Draw button states
-  hal_display_draw_text(0, "Btn:", 0, 60, 1);
-  hal_display_draw_text(0, hal_input_read_button(1) ? "1" : "0", 0, 70, 1);
-  hal_display_draw_text(0, hal_input_read_button(2) ? "1" : "0", 10, 70, 1);
+  if (button2State) {
+    // Update all LEDs with the current hue
+    for (int i = 0; i < 6; i++) {
+      hal_output_set_led_hsv(i, ledHue * 256, 255, 128);
+    }
+    hal_output_update_leds();
+  }
+}
+
+void loop() {
+  // Timing control
+  static unsigned long lastUpdateTime = 0;
+  static unsigned long lastUIRefreshTime = 0;
+  unsigned long currentTime = millis();
   
-  hal_display_update(0);
+  // Process hardware inputs and update widgets (run at 50Hz)
+  if (currentTime - lastUpdateTime >= 20) {
+    lastUpdateTime = currentTime;
+    
+    // Process UI input events
+    processInput();
+    
+    // Update the app title periodically
+    updateAppTitle();
+    
+    // Update sensor data
+    hal_sensor_update();
+  }
   
-  // Display 2 (large horizontal display)
-  hal_display_clear(1);
-  
-  // Draw title
-  hal_display_draw_text(1, "ESP32 IoT Controller", 10, 0, 1);
-  hal_display_draw_line(1, 0, 10, 128, 10, 1);
-  
-  // Draw accelerometer values
-  float accelX = hal_sensor_read_accel_x();
-  float accelY = hal_sensor_read_accel_y();
-  float accelZ = hal_sensor_read_accel_z();
-  
-  hal_display_draw_text(1, "Accel:", 0, 15, 1);
-  hal_display_draw_text(1, ("X: " + String(accelX, 1)).c_str(), 50, 15, 1);
-  hal_display_draw_text(1, ("Y: " + String(accelY, 1)).c_str(), 50, 25, 1);
-  hal_display_draw_text(1, ("Z: " + String(accelZ, 1)).c_str(), 50, 35, 1);
-  
-  // Draw joystick values
-  int joyX = hal_input_read_joystick_x();
-  int joyY = hal_input_read_joystick_y();
-  
-  hal_display_draw_text(1, "Joy:", 0, 45, 1);
-  hal_display_draw_text(1, ("X: " + String(joyX)).c_str(), 50, 45, 1);
-  hal_display_draw_text(1, ("Y: " + String(joyY)).c_str(), 50, 55, 1);
-  
-  hal_display_update(1);
+  // Update UI at 30Hz (separate from sensor/input processing)
+  if (currentTime - lastUIRefreshTime >= 33) {
+    lastUIRefreshTime = currentTime;
+    
+    // Calculate delta time for animations (if needed)
+    unsigned long deltaTime = currentTime - lastUIRefreshTime;
+    
+    // Render both displays through UI manager
+    uiManager->update(deltaTime);
+  }
 }

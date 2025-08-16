@@ -126,6 +126,51 @@ public:
      * @return Widget* Pointer to parent widget, or nullptr if no parent
      */
     Widget* getParent() const;
+    
+    /**
+     * @brief Get X position
+     * 
+     * @return int16_t X position relative to parent
+     */
+    int16_t getX() const { return x; }
+    
+    /**
+     * @brief Get Y position
+     * 
+     * @return int16_t Y position relative to parent
+     */
+    int16_t getY() const { return y; }
+    
+    /**
+     * @brief Get widget width
+     * 
+     * @return int16_t Width in pixels
+     */
+    int16_t getWidth() const { return width; }
+    
+    /**
+     * @brief Get widget height
+     * 
+     * @return int16_t Height in pixels
+     */
+    int16_t getHeight() const { return height; }
+    
+    /**
+     * @brief Calculate absolute position (including parent offsets)
+     * 
+     * @param absX Reference to store absolute X position
+     * @param absY Reference to store absolute Y position
+     */
+    void getAbsolutePosition(int16_t& absX, int16_t& absY) const {
+        absX = x;
+        absY = y;
+        const Widget* currentParent = parent;
+        while (currentParent) {
+            absX += currentParent->x;
+            absY += currentParent->y;
+            currentParent = currentParent->parent;
+        }
+    }
 
 protected:
     int16_t x;            ///< X position relative to parent
