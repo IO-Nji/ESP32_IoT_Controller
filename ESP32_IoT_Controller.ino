@@ -129,7 +129,7 @@ void initUI() {
   // Create AppTitleWidget for Display 1 (vertical 128x32)
   // With rotation 3 (portrait), the display is effectively 32 wide x 128 high
   // Position at top center (0,0) with full width and appropriate height
-  appTitle = new AppTitleWidget(0, 0, 32, 32, "ESP32 IOT");
+  appTitle = new AppTitleWidget(0, 0, 32, 26, "ESP32 IOT");
   display1Screen->addWidget(appTitle);
   
   // Create KeypadShortcutsWidget for Display 1
@@ -144,7 +144,7 @@ void initUI() {
   keypadShortcuts->setShortcut('*', "Previous");
   display1Screen->addWidget(keypadShortcuts);
   
-  // Main menu widget with standard dimensions (33,4,95,41)
+  // Main menu widget with standard dimensions (40,4,95,41)
   // No labels shown while in menus as requested
   mainMenu = createStandardMenu("");
   
