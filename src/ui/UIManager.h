@@ -51,6 +51,14 @@ public:
     Screen* getActiveScreen(uint8_t displayIndex);
     
     /**
+     * @brief Get the active screen ID for a display
+     * 
+     * @param displayIndex Display index (0 for display1, 1 for display2)
+     * @return uint8_t ID of the active screen
+     */
+    uint8_t getActiveScreenId(uint8_t displayIndex);
+    
+    /**
      * @brief Update all active screens
      * 
      * @param deltaTime Time elapsed since last update (milliseconds)

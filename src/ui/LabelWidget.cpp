@@ -50,7 +50,8 @@ void LabelWidget::draw(Adafruit_GFX& display) {
     }
     
     // Center vertically within the height
-    textY = absY + (height - textHeight) / 2;
+    // We need to account for the text baseline
+    textY = absY + (height - textHeight) / 2 + textHeight;
     
     // Draw the text
     display.setCursor(textX, textY);

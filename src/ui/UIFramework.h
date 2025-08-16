@@ -10,7 +10,10 @@
 #include "Widget.h"
 #include "LabelWidget.h"
 #include "ButtonWidget.h"
+#include "ButtonLabelWidget.h"
 #include "AppTitleWidget.h"
+#include "KeypadShortcutsWidget.h"
+#include "MenuWidget.h"
 #include "Screen.h"
 #include "UIManager.h"
 

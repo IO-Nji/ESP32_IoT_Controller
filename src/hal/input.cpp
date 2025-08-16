@@ -10,14 +10,19 @@ static char keys[KEYPAD_ROWS][KEYPAD_COLS] = {
 };
 static Keypad keypad = Keypad(makeKeymap(keys), const_cast<uint8_t*>(KEYPAD_ROW_PINS), 
                             const_cast<uint8_t*>(KEYPAD_COL_PINS), KEYPAD_ROWS, KEYPAD_COLS);
-static Encoder rotaryEncoder(ENCODER_SW1_PIN, ENCODER_SW2_PIN);
+                            
+// ESP32-specific rotary encoder implementation
+static ESP32Encoder rotaryEncoder;
+
+// For manual tracking of encoder position if needed
+static volatile int lastEncoderValue = 0;
 
 // Get access to the raw input device objects if needed
 Keypad* hal_input_get_keypad() {
     return &keypad;
 }
 
-Encoder* hal_input_get_encoder() {
+ESP32Encoder* hal_input_get_encoder() {
     return &rotaryEncoder;
 }
 
@@ -31,10 +36,27 @@ void hal_input_init() {
     pinMode(JOYSTICK_X_PIN, INPUT);
     pinMode(JOYSTICK_Y_PIN, INPUT);
     
-    // Configure encoder button pin
+    // Configure encoder pins with explicit pullups
+    pinMode(ENCODER_SW1_PIN, INPUT_PULLUP);
+    pinMode(ENCODER_SW2_PIN, INPUT_PULLUP);
     pinMode(ENCODER_BTN_PIN, INPUT_PULLUP);
     
-    // Keypad and encoder are initialized by their constructors
+    // Configure the ESP32Encoder
+    // Create a completely fresh configuration
+    rotaryEncoder.clearCount();
+    delay(10);
+    
+    // Attach in full quadrature mode for maximum responsiveness
+    // This detects all edge transitions for maximum sensitivity
+    rotaryEncoder.attachFullQuad(ENCODER_SW1_PIN, ENCODER_SW2_PIN);
+    
+    // Reset encoder position
+    rotaryEncoder.setCount(0);
+    lastEncoderValue = 0;
+    
+    Serial.println("Input hardware initialized with ESP32Encoder");
+    Serial.println("Encoder configured in single edge mode");
+    Serial.println("Encoder starts at position 0");
 }
 
 char hal_input_read_keypad() {
@@ -64,11 +86,15 @@ int hal_input_read_pot() {
 }
 
 long hal_input_read_encoder() {
-    return rotaryEncoder.read();
+    // Read count directly from ESP32Encoder without division
+    // for more responsive navigation
+    return rotaryEncoder.getCount();
 }
 
 void hal_input_set_encoder(long position) {
-    rotaryEncoder.write(position);
+    // Set the count directly
+    rotaryEncoder.setCount(position);
+    lastEncoderValue = position;
 }
 
 bool hal_input_read_encoder_btn() {

@@ -3,7 +3,7 @@
 
 #include <Arduino.h>
 #include <Keypad.h>
-#include <Encoder.h>
+#include <ESP32Encoder.h>
 
 /**
  * @file input.h
@@ -14,7 +14,7 @@
 
 // Get access to the raw input device objects if needed
 Keypad* hal_input_get_keypad();
-Encoder* hal_input_get_encoder();
+ESP32Encoder* hal_input_get_encoder();
 
 /**
  * Initialize all input peripherals (buttons, keypad, joystick, rotary encoder).

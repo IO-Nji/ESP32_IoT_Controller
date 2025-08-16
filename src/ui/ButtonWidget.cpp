@@ -52,7 +52,7 @@ void ButtonWidget::draw(Adafruit_GFX& display) {
     display.getTextBounds(label, 0, 0, &x1, &y1, &textWidth, &textHeight);
     
     int16_t textX = absX + (width - textWidth) / 2;
-    int16_t textY = absY + (height - textHeight) / 2;
+    int16_t textY = absY + (height - textHeight) / 2 + textHeight; // Add textHeight to align with baseline
     
     // Draw the label
     display.setCursor(textX, textY);
