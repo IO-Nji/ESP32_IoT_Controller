@@ -36,9 +36,10 @@ void AppTitleWidget::draw(Adafruit_GFX& display) {
     uint16_t titleWidth, titleHeight;
     display.getTextBounds(upperTitle, 0, 0, &titleX1, &titleY1, &titleWidth, &titleHeight);
     int16_t titleX = absX + (width - titleWidth) / 2;
-    int16_t titleY = absY + 4 + titleHeight; // Small margin from top + account for baseline
+    int16_t titleY = absY + 2 + titleHeight; // Reduced top margin from 4px to 2px
     
-    // Draw the title
+    // Draw the title with normal text color
+    display.setTextColor(SSD1306_WHITE);
     display.setCursor(titleX, titleY);
     display.print(upperTitle);
     
@@ -51,14 +52,13 @@ void AppTitleWidget::draw(Adafruit_GFX& display) {
     display.getTextBounds(abbreviation, 0, 0, &abbrX1, &abbrY1, &abbrWidth, &abbrHeight);
     int16_t abbrX = absX + (width - abbrWidth) / 2;
     
-    // Calculate the vertical center between title and bottom of widget area
-    // This will give proper vertical spacing in the box
-    int16_t availableHeightForAbbr = height - (titleHeight + 8); // Height minus title and its margin
-    int16_t abbrY = absY + titleHeight + 8 + (availableHeightForAbbr - abbrHeight) / 2 + abbrHeight;
+    // Use a 3-pixel spacing between title and abbreviation
+    int16_t availableHeightForAbbr = height - (titleHeight + 3); // Height minus title and reduced margin (3px)
+    int16_t abbrY = absY + titleHeight + 3 + (availableHeightForAbbr - abbrHeight) / 2 + abbrHeight;
     
     // Draw the abbreviation
     display.setCursor(abbrX, abbrY);
-    display.print(abbreviation);
+    display.print(abbreviation); // Display the actual abbreviation
 }
 
 void AppTitleWidget::setTitle(const String& newTitle) {

@@ -101,6 +101,15 @@ This project aims to build a versatile, industrial-grade IoT device using the ES
 
 ---
 
+## Documentation
+
+Detailed documentation for the project is available in the `/docs` directory:
+
+- [UI Framework Guide](docs/UI_Framework_Guide.md): Comprehensive guide to the UI system architecture
+- [UI Framework Example](docs/UI_Framework_Example.md): Code examples demonstrating UI component usage
+
+---
+
 ## Configuration & Build Workflow
 
 ### Project Structure
