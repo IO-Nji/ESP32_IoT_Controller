@@ -1,0 +1,24 @@
+// Example of using the AppTitleWidget
+
+// In your header includes
+#include "src/ui/UIFramework.h"
+
+// Inside a function or setup() method
+void createDisplayOneWidgets() {
+  // Create an AppTitleWidget for the 32x128 vertical display
+  // Parameters: x, y, width, height, title
+  AppTitleWidget* titleWidget = new AppTitleWidget(0, 0, 32, 32, "Temperature");
+  screenOne->addWidget(titleWidget);
+  
+  // The widget will display "TEMPERATURE" at the top in text size 1
+  // And "TE" centered below in text size 2
+  
+  // Other widgets would be placed below it (y >= 32)
+  // For example:
+  LabelWidget* valueLabel = new LabelWidget(0, 35, 32, 20, "24°C", 2, LabelWidget::Alignment::CENTER);
+  screenOne->addWidget(valueLabel);
+}
+
+// You can update the title at any time:
+titleWidget->setTitle("Humidity");
+// This would change the display to "HUMIDITY" and "HU"

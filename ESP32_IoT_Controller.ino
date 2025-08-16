@@ -31,15 +31,25 @@ void initUI() {
   Screen* mainScreen1 = uiManager->createScreen(0, MAIN_SCREEN_ID); // Display 1, Main Screen
   Screen* mainScreen2 = uiManager->createScreen(1, MAIN_SCREEN_ID); // Display 2, Main Screen
   
-  // Create AppTitleWidget for Display 1 (vertical 32x128)
-  // The widget will display "ESP32 IOT" and an abbreviated "EI" below it
-  appTitle = new AppTitleWidget(0, 10, 32, 50, "ESP32 IOT");
+  // Create AppTitleWidget for Display 1 (vertical 128x32)
+  // With rotation 3 (portrait), the display is effectively 32 wide x 128 high
+  // Place the widget centered horizontally and in the upper part vertically
+  appTitle = new AppTitleWidget(0, 5, 32, 50, "ESP32 IOT");
+  
+  // Print debug message
+  Serial.println("AppTitleWidget created with text: ESP32 IOT");
   
   // Add widget to screen 1
   mainScreen1->addWidget(appTitle);
   
-  // Create a simple label for Display 2 to show it's working
-  LabelWidget* infoLabel = new LabelWidget(0, 25, 128, 16, "AppTitleWidget Demo", 1, LabelWidget::Alignment::CENTER);
+  // Create multiple labels for Display 2 to show status
+  LabelWidget* infoLabel = new LabelWidget(0, 10, 128, 16, "AppTitleWidget Demo", 1, LabelWidget::Alignment::CENTER);
+  LabelWidget* debugLabel = new LabelWidget(0, 30, 128, 16, "Status: Active", 1, LabelWidget::Alignment::CENTER);
+  LabelWidget* versionLabel = new LabelWidget(0, 50, 128, 16, "Ver: 1.0", 1, LabelWidget::Alignment::CENTER);
+  
+  // Add all labels to screen 2
+  mainScreen2->addWidget(debugLabel);
+  mainScreen2->addWidget(versionLabel);
   
   // Add widget to screen 2
   mainScreen2->addWidget(infoLabel);
@@ -47,6 +57,9 @@ void initUI() {
   // Activate the main screens
   uiManager->setActiveScreen(0, MAIN_SCREEN_ID);
   uiManager->setActiveScreen(1, MAIN_SCREEN_ID);
+  
+  // Force an immediate update of the displays
+  uiManager->update(0);
 }
 
 void setup() {
@@ -73,6 +86,8 @@ void setup() {
   hal_display_draw_text(1, "Initializing", 32, 30, 1);
   hal_display_update(1);
   
+  delay(1000); // Show startup message for a short time
+  
   // Flash the LEDs to indicate startup
   for (int i = 0; i < 3; i++) {
     hal_output_fill_leds(64, 64, 64);
@@ -84,6 +99,12 @@ void setup() {
   
   // Initialize UI components
   initUI();
+  
+  Serial.println("UI initialized, rendering initial state");
+  
+  // Force initial rendering to make sure widgets appear
+  uiManager->update(0);
+  uiManager->render();
   
   Serial.println("Initialization complete");
 }
@@ -104,6 +125,10 @@ void updateAppTitle() {
   if (millis() - lastTitleChange > 3000) {
     titleIndex = (titleIndex + 1) % 4;
     appTitle->setTitle(titles[titleIndex]);
+    
+    // Print debug message to verify title is changing
+    Serial.print("Changing title to: ");
+    Serial.println(titles[titleIndex]);
     
     // Provide feedback
     hal_output_set_buzzer(true);
@@ -145,7 +170,14 @@ void loop() {
   // Timing control
   static unsigned long lastUpdateTime = 0;
   static unsigned long lastUIRefreshTime = 0;
+  static unsigned long lastDebugTime = 0;
   unsigned long currentTime = millis();
+  
+  // Print debug info periodically (every 5 seconds)
+  if (currentTime - lastDebugTime > 5000) {
+    Serial.println("Debug: UI running, title = " + appTitle->getTitle());
+    lastDebugTime = currentTime;
+  }
   
   // Process hardware inputs and update widgets (run at 50Hz)
   if (currentTime - lastUpdateTime >= 20) {
@@ -168,7 +200,10 @@ void loop() {
     // Calculate delta time for animations (if needed)
     unsigned long deltaTime = currentTime - lastUIRefreshTime;
     
-    // Render both displays through UI manager
+    // First update widget states
     uiManager->update(deltaTime);
+    
+    // Then render the widgets to the displays
+    uiManager->render();
   }
 }
