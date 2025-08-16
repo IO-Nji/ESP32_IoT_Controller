@@ -12,11 +12,102 @@
 // UI Manager instance to control both displays
 UIManager* uiManager;
 
+// Standard menu dimensions
+// Start from X=33 and cover the rest of the screen width (128-33=95)
+#define MENU_X 41
+#define MENU_Y 4  // Start from y=4 as requested
+#define MENU_WIDTH 95
+#define MENU_HEIGHT 41
+
+// Button label dimensions
+#define BUTTON_LABEL_HEIGHT 14  // Increased to 14px as requested
+#define BUTTON_LABEL_Y (SCREEN_HEIGHT_DISP2 - BUTTON_LABEL_HEIGHT) // Position from bottom (64-14=50)
+#define BUTTON_LABEL_WIDTH 40   // Width of each button label
+#define HOME_BUTTON_X 15        // Left button position
+#define BACK_BUTTON_X 73        // Right button position
+
+// Helper function to create a standard menu widget with consistent styling (33,4,95,41)
+// No longer needs title parameter as titles are displayed separately
+MenuWidget* createStandardMenu(const String& title = "") {
+  // We still pass the title parameter to maintain API compatibility
+  // but it won't be displayed in the MenuWidget anymore
+  return new MenuWidget(MENU_X, MENU_Y, MENU_WIDTH, MENU_HEIGHT, title);
+}
+
+// Helper function to add the standard button labels to a screen
+void addButtonLabelsToScreen(Screen* screen) {
+  // Create "Home" button label on left side
+  ButtonLabelWidget* homeButton = new ButtonLabelWidget(
+    HOME_BUTTON_X, BUTTON_LABEL_Y, BUTTON_LABEL_WIDTH, BUTTON_LABEL_HEIGHT,
+    "Home", 1);
+  screen->addWidget(homeButton);
+  
+  // Create "Back" button label on right side
+  ButtonLabelWidget* backButton = new ButtonLabelWidget(
+    BACK_BUTTON_X, BUTTON_LABEL_Y, BUTTON_LABEL_WIDTH, BUTTON_LABEL_HEIGHT,
+    "Back", 1);
+  screen->addWidget(backButton);
+}
+
 // Screen IDs for different screens
 #define MAIN_SCREEN_ID 0
+#define APPS_MENU_ID 1
+#define NETWORK_MENU_ID 2
 
 // AppTitleWidget for Display 1 (vertical 128x32)
 AppTitleWidget* appTitle;
+
+// KeypadShortcutsWidget for Display 1 (vertical 128x32)
+KeypadShortcutsWidget* keypadShortcuts;
+
+// Helper function to update keypad shortcuts based on the current screen/mode
+void updateKeypadShortcuts(int screenId) {
+  // Clear existing shortcuts
+  keypadShortcuts->clearShortcuts();
+  
+  // Set default shortcuts that are common across screens
+  keypadShortcuts->setShortcut('A', "Home");
+  keypadShortcuts->setShortcut('B', "Back");
+  
+  // Set screen-specific shortcuts
+  switch(screenId) {
+    case MAIN_SCREEN_ID:
+      keypadShortcuts->setShortcut('C', "Menu");
+      keypadShortcuts->setShortcut('D', "Select");
+      keypadShortcuts->setShortcut('#', "Next");
+      keypadShortcuts->setShortcut('*', "Prev");
+      break;
+    case APPS_MENU_ID:
+      keypadShortcuts->setShortcut('C', "Run");
+      keypadShortcuts->setShortcut('D', "Info");
+      keypadShortcuts->setShortcut('#', "Next");
+      keypadShortcuts->setShortcut('*', "Prev");
+      break;
+    case NETWORK_MENU_ID:
+      keypadShortcuts->setShortcut('C', "Connect");
+      keypadShortcuts->setShortcut('D', "Scan");
+      keypadShortcuts->setShortcut('#', "Next");
+      keypadShortcuts->setShortcut('*', "Refresh");
+      break;
+    default:
+      // Default shortcuts for unknown screens
+      keypadShortcuts->setShortcut('C', "Menu");
+      keypadShortcuts->setShortcut('D', "Select");
+      break;
+  }
+}
+
+// Menu widgets for hierarchical navigation
+MenuWidget* mainMenu;
+MenuWidget* appsMenu;
+MenuWidget* networkMenu;
+
+// Forward declarations of menu callback functions
+void onAppsMenuSelected(MenuWidget* menu);
+void onSystemMonitorSelected(MenuWidget* menu);
+void onIoTControlSelected(MenuWidget* menu);
+void onNetworkMenuSelected(MenuWidget* menu);
+void onBackToMainSelected(MenuWidget* menu);
 
 // Initialize the UI widgets and screens
 void initUI() {
@@ -27,32 +118,79 @@ void initUI() {
   // Create UI manager with both displays
   uiManager = new UIManager(*display1, *display2);
   
-  // Create screens for each display
-  Screen* mainScreen1 = uiManager->createScreen(0, MAIN_SCREEN_ID); // Display 1, Main Screen
-  Screen* mainScreen2 = uiManager->createScreen(1, MAIN_SCREEN_ID); // Display 2, Main Screen
+  // Create main screens
+  Screen* display1Screen = uiManager->createScreen(0, MAIN_SCREEN_ID);  // Display 1 (vertical 128x32)
+  Screen* mainMenuScreen = uiManager->createScreen(1, MAIN_SCREEN_ID);  // Display 2 (horizontal 128x64) - Main Menu
+  
+  // Create submenu screens
+  Screen* appsMenuScreen = uiManager->createScreen(1, APPS_MENU_ID);    // Apps Menu
+  Screen* networkMenuScreen = uiManager->createScreen(1, NETWORK_MENU_ID); // Network Menu
   
   // Create AppTitleWidget for Display 1 (vertical 128x32)
   // With rotation 3 (portrait), the display is effectively 32 wide x 128 high
-  // Place the widget centered horizontally and in the upper part vertically
-  appTitle = new AppTitleWidget(0, 5, 32, 50, "ESP32 IOT");
+  // Position at top center (0,0) with full width and appropriate height
+  appTitle = new AppTitleWidget(0, 0, 32, 32, "ESP32 IOT");
+  display1Screen->addWidget(appTitle);
   
-  // Print debug message
-  Serial.println("AppTitleWidget created with text: ESP32 IOT");
+  // Create KeypadShortcutsWidget for Display 1
+  // Position at bottom with full width and 64px height
+  keypadShortcuts = new KeypadShortcutsWidget(0, 128 - 64, 32, 64);
+  // Set some initial shortcuts
+  keypadShortcuts->setShortcut('A', "Home");
+  keypadShortcuts->setShortcut('B', "Back");
+  keypadShortcuts->setShortcut('C', "Menu");
+  keypadShortcuts->setShortcut('D', "Select");
+  keypadShortcuts->setShortcut('#', "Next");
+  keypadShortcuts->setShortcut('*', "Previous");
+  display1Screen->addWidget(keypadShortcuts);
   
-  // Add widget to screen 1
-  mainScreen1->addWidget(appTitle);
+  // Main menu widget with standard dimensions (33,4,95,41)
+  // No labels shown while in menus as requested
+  mainMenu = createStandardMenu("");
   
-  // Create multiple labels for Display 2 to show status
-  LabelWidget* infoLabel = new LabelWidget(0, 10, 128, 16, "AppTitleWidget Demo", 1, LabelWidget::Alignment::CENTER);
-  LabelWidget* debugLabel = new LabelWidget(0, 30, 128, 16, "Status: Active", 1, LabelWidget::Alignment::CENTER);
-  LabelWidget* versionLabel = new LabelWidget(0, 50, 128, 16, "Ver: 1.0", 1, LabelWidget::Alignment::CENTER);
+  // Add main menu items with plain text (no icons)
+  mainMenu->addItem("Apps", onAppsMenuSelected);
+  mainMenu->addItem("SYS Monitor", onSystemMonitorSelected);
+  mainMenu->addItem("IoT Control", onIoTControlSelected);
+  mainMenu->addItem("Network", onNetworkMenuSelected);
   
-  // Add all labels to screen 2
-  mainScreen2->addWidget(debugLabel);
-  mainScreen2->addWidget(versionLabel);
+  // Add main menu to main screen
+  mainMenuScreen->addWidget(mainMenu);
   
-  // Add widget to screen 2
-  mainScreen2->addWidget(infoLabel);
+  // Add button labels to help users understand the physical button functions
+  addButtonLabelsToScreen(mainMenuScreen);
+  
+  // --- Apps Menu Screen ---
+  // No labels shown while in menus as requested
+  // Apps menu widget with standard dimensions (33,4,95,41)
+  appsMenu = createStandardMenu("");
+
+  // Add apps menu items (plain text, no icons)
+  appsMenu->addItem("Clock", nullptr);
+  appsMenu->addItem("Timer", nullptr);
+  appsMenu->addItem("Pomodoro", nullptr);
+  
+  // Add apps menu to its screen
+  appsMenuScreen->addWidget(appsMenu);
+  
+  // Add button labels to help users understand the physical button functions
+  addButtonLabelsToScreen(appsMenuScreen);
+  
+    // --- Network Menu Screen ---
+  // No labels shown while in menus as requested
+  // Network menu widget with standard dimensions (33,4,95,41)
+  networkMenu = createStandardMenu("");
+
+  // Add network menu items (plain text, no icons)
+  networkMenu->addItem("NET Status", nullptr);
+  networkMenu->addItem("NET Config", nullptr);
+  networkMenu->addItem("WiFi Setup", nullptr);
+  
+  // Add network menu to its screen
+  networkMenuScreen->addWidget(networkMenu);
+  
+  // Add button labels to help users understand the physical button functions
+  addButtonLabelsToScreen(networkMenuScreen);
   
   // Activate the main screens
   uiManager->setActiveScreen(0, MAIN_SCREEN_ID);
@@ -71,9 +209,7 @@ void setup() {
   hal_display_init();
   hal_input_init();
   hal_output_init();
-  if (!hal_sensor_init()) {
-    Serial.println("Failed to initialize MPU6050 sensor");
-  }
+  hal_sensor_init();
   
   // Display a startup message directly with HAL
   hal_display_clear(0);
@@ -88,81 +224,155 @@ void setup() {
   
   delay(1000); // Show startup message for a short time
   
-  // Flash the LEDs to indicate startup
-  for (int i = 0; i < 3; i++) {
-    hal_output_fill_leds(64, 64, 64);
-    hal_output_update_leds();
-    delay(100);
-    hal_output_clear_leds();
-    delay(100);
-  }
+  // Reset encoder position
+  hal_input_set_encoder(0);
   
   // Initialize UI components
   initUI();
   
-  Serial.println("UI initialized, rendering initial state");
+  // Initialize keypad shortcuts for main screen
+  updateKeypadShortcuts(MAIN_SCREEN_ID);
   
   // Force initial rendering to make sure widgets appear
   uiManager->update(0);
   uiManager->render();
-  
-  Serial.println("Initialization complete");
 }
 
-// Demo function to update the app title periodically
-void updateAppTitle() {
-  // Titles to cycle through for demonstration
-  static const char* titles[] = {
-    "ESP32 IOT", 
-    "DASHBOARD", 
-    "SETTINGS", 
-    "SENSOR DATA"
-  };
-  static uint8_t titleIndex = 0;
-  static unsigned long lastTitleChange = 0;
+// Menu callback functions
+void onAppsMenuSelected(MenuWidget* menu) {
+  // Switch to the Apps submenu
+  uiManager->setActiveScreen(1, APPS_MENU_ID);
+  appTitle->setTitle("APPS");
   
-  // Change title every 3 seconds
-  if (millis() - lastTitleChange > 3000) {
-    titleIndex = (titleIndex + 1) % 4;
-    appTitle->setTitle(titles[titleIndex]);
-    
-    // Print debug message to verify title is changing
-    Serial.print("Changing title to: ");
-    Serial.println(titles[titleIndex]);
-    
-    // Provide feedback
-    hal_output_set_buzzer(true);
-    delay(50);
-    hal_output_set_buzzer(false);
-    
-    lastTitleChange = millis();
-  }
+  // Update keypad shortcuts for this screen
+  updateKeypadShortcuts(APPS_MENU_ID);
+  
+  // Provide feedback
+  hal_output_set_buzzer(true);
+  delay(50);
+  hal_output_set_buzzer(false);
+}
+
+void onSystemMonitorSelected(MenuWidget* menu) {
+  // For now, just update the title
+  appTitle->setTitle("MONITOR");
+  
+  // Provide feedback
+  hal_output_set_buzzer(true);
+  delay(50);
+  hal_output_set_buzzer(false);
+}
+
+void onIoTControlSelected(MenuWidget* menu) {
+  // For now, just update the title
+  appTitle->setTitle("IOT CTRL");
+  
+  // Provide feedback
+  hal_output_set_buzzer(true);
+  delay(50);
+  hal_output_set_buzzer(false);
+}
+
+void onNetworkMenuSelected(MenuWidget* menu) {
+  // Switch to the Network submenu
+  uiManager->setActiveScreen(1, NETWORK_MENU_ID);
+  appTitle->setTitle("NETWORK");
+  
+  // Update keypad shortcuts for this screen
+  updateKeypadShortcuts(NETWORK_MENU_ID);
+  
+  // Provide feedback
+  hal_output_set_buzzer(true);
+  delay(50);
+  hal_output_set_buzzer(false);
+}
+
+void onBackToMainSelected(MenuWidget* menu) {
+  // Return to the main menu
+  uiManager->setActiveScreen(1, MAIN_SCREEN_ID);
+  appTitle->setTitle("ESP32 IOT");
+  
+  // Update keypad shortcuts for this screen
+  updateKeypadShortcuts(MAIN_SCREEN_ID);
+  
+  // Provide feedback
+  hal_output_set_buzzer(true);
+  delay(50);
+  hal_output_set_buzzer(false);
 }
 
 // Process user input for UI interactions
 void processInput() {
-  // Handle physical button inputs
-  bool button1State = hal_input_read_button(1);
-  bool button2State = hal_input_read_button(2);
+  // Read encoder value for menu navigation
+  static long lastEncoderValue = 0;
   
-  // Use buttons for LED color effects
-  static uint8_t ledHue = 0;
+  // Get the encoder value
+  long encoderValue = hal_input_read_encoder();
   
-  if (button1State) {
-    ledHue = (ledHue + 10) % 256;
-    
-    // Provide feedback
-    hal_output_set_buzzer(true);
-    delay(50);
-    hal_output_set_buzzer(false);
+  // Get the active screen ID to determine which menu to control
+  int activeScreenId = uiManager->getActiveScreenId(1);
+  MenuWidget* activeMenu = mainMenu; // Default to main menu
+  
+  // Select the appropriate menu based on active screen
+  if (activeScreenId == APPS_MENU_ID) {
+    activeMenu = appsMenu;
+  } else if (activeScreenId == NETWORK_MENU_ID) {
+    activeMenu = networkMenu;
   }
   
-  if (button2State) {
-    // Update all LEDs with the current hue
-    for (int i = 0; i < 6; i++) {
-      hal_output_set_led_hsv(i, ledHue * 256, 255, 128);
+  // Check if encoder value has changed
+  if (encoderValue != lastEncoderValue) {
+    // Handle encoder rotation for menu navigation
+    long diff = encoderValue - lastEncoderValue;
+    
+    if (diff > 0) {
+      // Positive change - navigate down
+      activeMenu->navigateNext();
+      
+      // Provide subtle feedback
+      hal_output_set_buzzer(true);
+      delay(20);
+      hal_output_set_buzzer(false);
+    } 
+    else if (diff < 0) {
+      // Negative change - navigate up
+      activeMenu->navigatePrevious();
+      
+      // Provide subtle feedback
+      hal_output_set_buzzer(true);
+      delay(20);
+      hal_output_set_buzzer(false);
     }
-    hal_output_update_leds();
+    
+    // Update last encoder value
+    lastEncoderValue = encoderValue;
+  }
+  
+  // Handle encoder button press for menu selection
+  if (hal_input_read_encoder_btn()) {
+    activeMenu->selectCurrentItem();
+    delay(200); // Debounce delay
+  }
+  
+  // Handle physical button inputs for navigation
+  bool homeButtonState = hal_input_read_button(1);  // Left button - "Home"
+  bool backButtonState = hal_input_read_button(2);  // Right button - "Back"
+  
+  if (homeButtonState) {
+    // Home button always returns to main menu
+    if (activeScreenId != MAIN_SCREEN_ID) {
+      onBackToMainSelected(nullptr);
+    }
+    delay(200); // Debounce delay
+  }
+  
+  if (backButtonState) {
+    // Back button goes up one level in menu hierarchy
+    // For now, it also returns to main menu from submenus
+    if (activeScreenId != MAIN_SCREEN_ID) {
+      onBackToMainSelected(nullptr);
+    }
+    delay(200); // Debounce delay
   }
 }
 
@@ -170,24 +380,14 @@ void loop() {
   // Timing control
   static unsigned long lastUpdateTime = 0;
   static unsigned long lastUIRefreshTime = 0;
-  static unsigned long lastDebugTime = 0;
   unsigned long currentTime = millis();
-  
-  // Print debug info periodically (every 5 seconds)
-  if (currentTime - lastDebugTime > 5000) {
-    Serial.println("Debug: UI running, title = " + appTitle->getTitle());
-    lastDebugTime = currentTime;
-  }
   
   // Process hardware inputs and update widgets (run at 50Hz)
   if (currentTime - lastUpdateTime >= 20) {
     lastUpdateTime = currentTime;
     
-    // Process UI input events
+    // Process UI input events for menu navigation
     processInput();
-    
-    // Update the app title periodically
-    updateAppTitle();
     
     // Update sensor data
     hal_sensor_update();
