@@ -53,7 +53,7 @@ void AppTitleWidget::draw(Adafruit_GFX& display) {
     int16_t abbrX = absX + (width - abbrWidth) / 2;
     
     // Use a 3-pixel spacing between title and abbreviation
-    int16_t availableHeightForAbbr = height - (titleHeight + 3); // Height minus title and reduced margin (3px)
+    int16_t availableHeightForAbbr = height - (titleHeight + 2); // Height minus title and reduced margin (3px)
     int16_t abbrY = absY + titleHeight + 3 + (availableHeightForAbbr - abbrHeight) / 2 + abbrHeight;
     
     // Draw the abbreviation
