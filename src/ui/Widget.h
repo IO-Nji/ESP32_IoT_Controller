@@ -4,6 +4,7 @@
 #include <Arduino.h>
 #include <Adafruit_SSD1306.h>
 #include <Adafruit_GFX.h>
+#include <ArduinoJson.h>
 
 /**
  * @brief Base widget class for the UI framework
@@ -56,10 +57,20 @@ public:
      * 
      * @param eventType Type of input event
      * @param eventData Additional event data (depends on event type)
-     * @return true if event was handled
-     * @return false if event was not handled
-     */
+    * @return true if event was handled
+    * @return false if event was not handled
+    */
     virtual bool handleInput(uint8_t eventType, int32_t eventData);
+
+    /**
+    * @brief Save widget state to JsonDocument (override in derived classes)
+    */
+    virtual void saveState(JsonDocument& state) {}
+
+    /**
+    * @brief Load widget state from JsonDocument (override in derived classes)
+    */
+    virtual void loadState(const JsonDocument& state) {}
     
     /**
      * @brief Set the visibility of the widget

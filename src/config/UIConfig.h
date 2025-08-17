@@ -8,7 +8,8 @@ namespace UI {
     enum ScreenId {
         MAIN_SCREEN = 0,
         APPS_MENU = 1,
-        NETWORK_MENU = 2
+        NETWORK_MENU = 2,
+        CLOCK_SCREEN = 3
     };
     
     // UI component dimensions

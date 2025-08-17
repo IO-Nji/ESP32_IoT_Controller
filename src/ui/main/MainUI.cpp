@@ -125,6 +125,12 @@ void MainUI::initUIDisplays() {
     uiManager->createScreen(1, UI::MAIN_SCREEN);    // Main menu
     uiManager->createScreen(1, UI::APPS_MENU);      // Apps menu
     uiManager->createScreen(1, UI::NETWORK_MENU);   // Network menu
+
+    // Create and add ClockScreen for display 2 (128x64)
+    static TimeService timeService;
+    static AlarmService alarmService(timeService);
+    clockScreen = new ClockScreen(uiManager->getDisplay(1), timeService, alarmService);
+    uiManager->addScreen(1, UI::CLOCK_SCREEN, clockScreen);
 }
 
 void MainUI::initUIMenus() {
@@ -138,8 +144,8 @@ void MainUI::initMainMenu() {
     mainMenu = createStandardMenu();
     
     mainMenu->addItem("Apps", onAppsMenuSelected);
-    mainMenu->addItem("SYSTEM", onSystemMonitorSelected);
-    mainMenu->addItem("IoT DEV", onIoTControlSelected);
+    mainMenu->addItem("System", onSystemMonitorSelected);
+    mainMenu->addItem("IoT DEVs", onIoTControlSelected);
     mainMenu->addItem("Network", onNetworkMenuSelected);
     
     mainMenuScreen->addWidget(mainMenu);
@@ -150,7 +156,7 @@ void MainUI::initAppsMenu() {
     Screen* appsMenuScreen = uiManager->getScreen(1, UI::APPS_MENU);
     appsMenu = createStandardMenu();
     
-    appsMenu->addItem("Clock", nullptr);
+    appsMenu->addItem("Clock", onClockSelected);
     appsMenu->addItem("Timer", nullptr);
     appsMenu->addItem("Pomodoro", nullptr);
     
@@ -303,3 +309,15 @@ void MainUI::onBackToMainSelected(MenuWidget* menu) {
         instance->provideHapticFeedback(50);
     }
 }
+
+void MainUI::onClockSelected(MenuWidget* menu) {
+    if (instance) {
+    instance->navigateToScreen(1, UI::CLOCK_SCREEN); // Switch display 2 to clock screen
+        instance->getAppTitle()->setTitle("CLOCK");
+        instance->updateKeypadShortcuts(UI::CLOCK_SCREEN);
+        instance->provideHapticFeedback(50);
+    }
+}
+
+// Example: Add ClockScreen to UIManager
+// ...existing code...

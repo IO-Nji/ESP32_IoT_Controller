@@ -2,8 +2,9 @@
 #define SCREEN_H
 
 #include <vector>
-#include "Widget.h"
+#include "../Widget.h"
 #include <Adafruit_SSD1306.h>
+#include <ArduinoJson.h>
 
 /**
  * @brief Screen manager class for organizing widgets on a display
@@ -47,6 +48,18 @@ public:
      */
     void render();
     
+    /**
+     * @brief Save the current screen state to a JsonDocument
+     * Override in derived classes for custom state.
+     */
+    virtual void saveState(JsonDocument& state);
+
+    /**
+     * @brief Restore the screen state from a JsonDocument
+     * Override in derived classes for custom state.
+     */
+    virtual void loadState(const JsonDocument& state);
+
     /**
      * @brief Update all widgets
      * 

@@ -97,12 +97,13 @@ private:
     UIManager* uiManager;
     AppTitleWidget* appTitle;
     KeypadShortcutsWidget* keypadShortcuts;
-    
+    ClockScreen* clockScreen;
+
     // Menu widgets
     MenuWidget* mainMenu;
     MenuWidget* appsMenu;
     MenuWidget* networkMenu;
-    
+
     // Helper methods
     void initUIDisplays();
     void initUIMenus();
@@ -111,14 +112,15 @@ private:
     void initNetworkMenu();
     MenuWidget* createStandardMenu();
     void addButtonLabelsToScreen(Screen* screen);
-    
+
     // Menu callbacks
     static void onAppsMenuSelected(MenuWidget* menu);
     static void onSystemMonitorSelected(MenuWidget* menu);
     static void onIoTControlSelected(MenuWidget* menu);
     static void onNetworkMenuSelected(MenuWidget* menu);
     static void onBackToMainSelected(MenuWidget* menu);
-    
+    static void onClockSelected(MenuWidget* menu);
+
     // Static reference for callbacks
     static MainUI* instance;
 };

@@ -38,8 +38,8 @@ src/
     ├── ButtonWidget.cpp     - Button implementation
     ├── GraphWidget.h        - Data visualization widget
     ├── GraphWidget.cpp      - Graph implementation
-    ├── Screen.h             - Container for widgets
-    ├── Screen.cpp           - Screen implementation
+    ├── screens/Screen.h             - Container for widgets
+    ├── screens/Screen.cpp           - Screen implementation
     ├── UIManager.h          - Manager for screens and displays
     ├── UIManager.cpp        - Manager implementation
     ├── UIFramework.h        - Common includes for UI components

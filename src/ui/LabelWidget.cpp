@@ -69,8 +69,12 @@ const String& LabelWidget::getText() const {
     return text;
 }
 
-void LabelWidget::setAlignment(Alignment alignment) {
-    this->alignment = alignment;
+void LabelWidget::setAlignment(Alignment align) {
+    alignment = align;
+}
+
+LabelWidget::Alignment LabelWidget::getAlignment() const {
+    return alignment;
 }
 
 void LabelWidget::setTextSize(uint8_t size) {

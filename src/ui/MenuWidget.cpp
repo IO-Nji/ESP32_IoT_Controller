@@ -293,3 +293,7 @@ void MenuWidget::adjustVisibleRange() {
         topVisibleIndex = max(0, (int)items.size() - (int)visibleItemsCount);
     }
 }
+
+
+// In the constructor, initialize alignment (e.g., alignment = LEFT;)
+// In draw(), use alignment to set the cursor position accordingly.

@@ -1,4 +1,5 @@
 #include "Screen.h"
+#include <ArduinoJson.h>
 
 Screen::Screen(Adafruit_SSD1306& display, uint16_t width, uint16_t height)
     : display(display), width(width), height(height) {
@@ -31,6 +32,20 @@ void Screen::render() {
     
     // Update the physical display
     display.display();
+}
+
+void Screen::saveState(JsonDocument& state) {
+    // Save state for each widget (if supported)
+    for (auto* widget : widgets) {
+        if (widget) widget->saveState(state);
+    }
+}
+
+void Screen::loadState(const JsonDocument& state) {
+    // Restore state for each widget (if supported)
+    for (auto* widget : widgets) {
+        if (widget) widget->loadState(state);
+    }
 }
 
 bool Screen::update(unsigned long deltaTime) {

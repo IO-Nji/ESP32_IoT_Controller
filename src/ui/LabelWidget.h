@@ -63,7 +63,8 @@ public:
      * 
      * @param alignment New alignment option
      */
-    void setAlignment(Alignment alignment);
+    void setAlignment(Alignment align);
+    Alignment getAlignment() const;
     
     /**
      * @brief Set the text size
