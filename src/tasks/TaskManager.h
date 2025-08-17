@@ -9,20 +9,29 @@
 #include "../util/MemoryMonitor.h"
 
 // Task priorities
-#define TASK_PRIORITY_UI       2
-#define TASK_PRIORITY_INPUT    3
-#define TASK_PRIORITY_SENSOR   1
+#define TASK_PRIORITY_UI            2
+#define TASK_PRIORITY_INPUT         3
+#define TASK_PRIORITY_SENSOR        1
+#define TASK_PRIORITY_NETWORK       2
+#define TASK_PRIORITY_STORAGE       1
+#define TASK_PRIORITY_POWER         1
 
 // Task stack sizes
-#define TASK_STACK_SIZE_UI     4096
-#define TASK_STACK_SIZE_INPUT  2048
-#define TASK_STACK_SIZE_SENSOR 2048
+#define TASK_STACK_SIZE_UI          4096
+#define TASK_STACK_SIZE_INPUT       2048
+#define TASK_STACK_SIZE_SENSOR      2048
+#define TASK_STACK_SIZE_NETWORK     4096
+#define TASK_STACK_SIZE_STORAGE     2048
+#define TASK_STACK_SIZE_POWER       2048
 
 // Task execution frequencies in milliseconds
-#define UI_UPDATE_INTERVAL     33  // 30Hz
-#define INPUT_UPDATE_INTERVAL  20  // 50Hz
-#define SENSOR_UPDATE_INTERVAL 100 // 10Hz
-#define WATCHDOG_CHECK_INTERVAL 5000 // 5 seconds
+#define UI_UPDATE_INTERVAL          33    // 30Hz
+#define INPUT_UPDATE_INTERVAL       20    // 50Hz
+#define SENSOR_UPDATE_INTERVAL      100   // 10Hz
+#define NETWORK_UPDATE_INTERVAL     500   // 2Hz
+#define STORAGE_UPDATE_INTERVAL     5000  // 0.2Hz
+#define POWER_UPDATE_INTERVAL       1000  // 1Hz
+#define WATCHDOG_CHECK_INTERVAL     5000  // 0.2Hz
 
 class TaskManager {
 public:
@@ -58,19 +67,31 @@ private:
     static TaskHandle_t uiTaskHandle;
     static TaskHandle_t inputTaskHandle;
     static TaskHandle_t sensorTaskHandle;
+    static TaskHandle_t networkTaskHandle;
+    static TaskHandle_t storageTaskHandle;
+    static TaskHandle_t powerTaskHandle;
     
     // Task status tracking
     static unsigned long lastUITaskAlive;
     static unsigned long lastInputTaskAlive;
     static unsigned long lastSensorTaskAlive;
+    static unsigned long lastNetworkTaskAlive;
+    static unsigned long lastStorageTaskAlive;
+    static unsigned long lastPowerTaskAlive;
     static uint8_t uiTaskErrors;
     static uint8_t inputTaskErrors;
     static uint8_t sensorTaskErrors;
+    static uint8_t networkTaskErrors;
+    static uint8_t storageTaskErrors;
+    static uint8_t powerTaskErrors;
     
     // Task functions
     static void uiTaskFunction(void* parameter);
     static void inputTaskFunction(void* parameter);
     static void sensorTaskFunction(void* parameter);
+    static void networkTaskFunction(void* parameter);
+    static void storageTaskFunction(void* parameter);
+    static void powerTaskFunction(void* parameter);
     static void watchdogTaskFunction(void* parameter);
 };
 
