@@ -67,6 +67,21 @@ uint8_t UIManager::getActiveScreenId(uint8_t displayIndex) {
     return 255; // Invalid screen ID
 }
 
+Screen* UIManager::getScreen(uint8_t displayIndex, uint8_t screenId) {
+    if (displayIndex == 0) {
+        auto it = screens1.find(screenId);
+        if (it != screens1.end()) {
+            return it->second.get();
+        }
+    } else if (displayIndex == 1) {
+        auto it = screens2.find(screenId);
+        if (it != screens2.end()) {
+            return it->second.get();
+        }
+    }
+    return nullptr;
+}
+
 void UIManager::update(unsigned long deltaTime) {
     // Update active screens
     Screen* screen1 = getActiveScreen(0);
