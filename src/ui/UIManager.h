@@ -71,8 +71,10 @@ public:
      * @brief Update all active screens
      * 
      * @param deltaTime Time elapsed since last update (milliseconds)
+     * @return true if update succeeded
+     * @return false if update failed
      */
-    void update(unsigned long deltaTime);
+    bool update(unsigned long deltaTime);
     
     /**
      * @brief Render all active screens to their displays

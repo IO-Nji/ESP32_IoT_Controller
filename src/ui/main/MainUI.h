@@ -6,6 +6,7 @@
 #include "../UIFramework.h"
 #include "../../config/UIConfig.h"
 #include "../../hal/output.h"
+#include "../../util/ErrorHandler.h"
 
 class MainUI {
 public:
@@ -26,8 +27,10 @@ public:
      * @brief Update the UI state
      * 
      * @param deltaTime Time since last update in milliseconds
+     * @return true if update succeeded
+     * @return false if update failed
      */
-    void update(unsigned long deltaTime);
+    bool update(unsigned long deltaTime);
     
     /**
      * @brief Render the UI to both displays
@@ -39,8 +42,18 @@ public:
      * 
      * @param displayIndex Display index (0 or 1)
      * @param screenId Screen ID to navigate to
+     * @return true if navigation succeeded
+     * @return false if navigation failed
      */
-    void navigateToScreen(uint8_t displayIndex, uint8_t screenId);
+    bool navigateToScreen(uint8_t displayIndex, uint8_t screenId);
+    
+    /**
+     * @brief Display an error message on the UI
+     * 
+     * @param message Error message to display
+     * @param severity Severity level of the error
+     */
+    void showErrorMessage(const String& message, ErrorSeverity severity = ErrorSeverity::ERROR);
     
     /**
      * @brief Update keypad shortcuts based on current screen

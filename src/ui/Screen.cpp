@@ -33,11 +33,22 @@ void Screen::render() {
     display.display();
 }
 
-void Screen::update(unsigned long deltaTime) {
-    // Update all widgets
-    for (Widget* widget : widgets) {
-        widget->update(deltaTime);
+bool Screen::update(unsigned long deltaTime) {
+    bool success = true;
+    
+    try {
+        // Update all widgets
+        for (Widget* widget : widgets) {
+            if (!widget->update(deltaTime)) {
+                success = false;
+            }
+        }
     }
+    catch (...) {
+        success = false;
+    }
+    
+    return success;
 }
 
 bool Screen::handleInput(uint8_t eventType, int32_t eventData) {

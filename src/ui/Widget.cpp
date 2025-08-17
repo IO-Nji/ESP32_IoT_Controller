@@ -4,9 +4,10 @@ Widget::Widget(int16_t x, int16_t y, int16_t width, int16_t height, bool visible
     : x(x), y(y), width(width), height(height), visible(visible), parent(nullptr) {
 }
 
-void Widget::update(unsigned long deltaTime) {
-    // Base implementation does nothing
+bool Widget::update(unsigned long deltaTime) {
+    // Base implementation does nothing and always succeeds
     // Derived classes can override for animations, etc.
+    return true;
 }
 
 bool Widget::handleInput(uint8_t eventType, int32_t eventData) {

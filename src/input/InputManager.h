@@ -4,6 +4,7 @@
 #include <Arduino.h>
 #include "../ui/main/MainUI.h"
 #include "../hal/input.h"
+#include "../util/ErrorHandler.h"
 
 class InputManager {
 public:
@@ -16,12 +17,17 @@ public:
     
     /**
      * @brief Update input state and process inputs
+     * 
+     * @return true if inputs were processed successfully
+     * @return false if an error occurred
      */
-    void update();
+    bool update();
     
 private:
     MainUI* mainUI;
     long lastEncoderValue;
+    unsigned long lastErrorTime;
+    uint8_t consecutiveErrors;
     
     void processEncoderInput();
     void processButtonInput();

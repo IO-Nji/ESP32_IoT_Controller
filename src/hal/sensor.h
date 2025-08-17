@@ -25,7 +25,7 @@ bool hal_sensor_init();
  * Update all sensor readings.
  * Call this before reading values to ensure fresh data.
  */
-void hal_sensor_update();
+bool hal_sensor_update();
 
 /**
  * Read the acceleration value on the X axis.

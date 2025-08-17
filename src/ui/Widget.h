@@ -44,8 +44,9 @@ public:
      * The base implementation does nothing; subclasses can override.
      * 
      * @param deltaTime Time elapsed since last update (milliseconds)
+     * @return true if update succeeded, false if it failed
      */
-    virtual void update(unsigned long deltaTime);
+    virtual bool update(unsigned long deltaTime);
     
     /**
      * @brief Process input events

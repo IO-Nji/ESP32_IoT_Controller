@@ -82,17 +82,25 @@ Screen* UIManager::getScreen(uint8_t displayIndex, uint8_t screenId) {
     return nullptr;
 }
 
-void UIManager::update(unsigned long deltaTime) {
+bool UIManager::update(unsigned long deltaTime) {
+    bool success = true;
+    
     // Update active screens
     Screen* screen1 = getActiveScreen(0);
     if (screen1) {
-        screen1->update(deltaTime);
+        if (!screen1->update(deltaTime)) {
+            success = false;
+        }
     }
     
     Screen* screen2 = getActiveScreen(1);
     if (screen2) {
-        screen2->update(deltaTime);
+        if (!screen2->update(deltaTime)) {
+            success = false;
+        }
     }
+    
+    return success;
 }
 
 void UIManager::render() {

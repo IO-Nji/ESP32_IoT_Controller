@@ -12,30 +12,96 @@ MainUI::MainUI(Adafruit_SSD1306& display1, Adafruit_SSD1306& display2) {
 }
 
 void MainUI::setup() {
-    initUIDisplays();
-    initUIMenus();
-    
-    // Activate main screens
-    uiManager->setActiveScreen(0, UI::MAIN_SCREEN);
-    uiManager->setActiveScreen(1, UI::MAIN_SCREEN);
-    
-    // Configure initial shortcuts
-    updateKeypadShortcuts(UI::MAIN_SCREEN);
-    
-    // Force an immediate update
-    uiManager->update(0);
+    // Initialize UI with error handling
+    try {
+        initUIDisplays();
+        initUIMenus();
+        
+        // Activate main screens
+        if (!uiManager->setActiveScreen(0, UI::MAIN_SCREEN)) {
+            REPORT_ERROR(ErrorCategory::UI, ErrorSeverity::ERROR, "Failed to set active screen for display 0");
+        }
+        
+        if (!uiManager->setActiveScreen(1, UI::MAIN_SCREEN)) {
+            REPORT_ERROR(ErrorCategory::UI, ErrorSeverity::ERROR, "Failed to set active screen for display 1");
+        }
+        
+        // Configure initial shortcuts
+        updateKeypadShortcuts(UI::MAIN_SCREEN);
+        
+        // Force an immediate update
+        uiManager->update(0);
+        
+        REPORT_INFO("UI setup completed successfully");
+    }
+    catch (const std::exception& e) {
+        REPORT_CRITICAL(ErrorCategory::UI, "Exception during UI setup: " + String(e.what()));
+    }
+    catch (...) {
+        REPORT_CRITICAL(ErrorCategory::UI, "Unknown exception during UI setup");
+    }
 }
 
-void MainUI::update(unsigned long deltaTime) {
-    uiManager->update(deltaTime);
+bool MainUI::update(unsigned long deltaTime) {
+    try {
+        bool result = uiManager->update(deltaTime);
+        
+        if (!result) {
+            REPORT_ERROR(ErrorCategory::UI, ErrorSeverity::WARNING, "UI update returned failure");
+        }
+        
+        return result;
+    }
+    catch (const std::exception& e) {
+        REPORT_ERROR(ErrorCategory::UI, ErrorSeverity::ERROR, "Exception during UI update: " + String(e.what()));
+        return false;
+    }
+    catch (...) {
+        REPORT_ERROR(ErrorCategory::UI, ErrorSeverity::ERROR, "Unknown exception during UI update");
+        return false;
+    }
 }
 
 void MainUI::render() {
-    uiManager->render();
+    try {
+        uiManager->render();
+    }
+    catch (const std::exception& e) {
+        REPORT_ERROR(ErrorCategory::UI, ErrorSeverity::ERROR, "Exception during UI render: " + String(e.what()));
+    }
+    catch (...) {
+        REPORT_ERROR(ErrorCategory::UI, ErrorSeverity::ERROR, "Unknown exception during UI render");
+    }
 }
 
-void MainUI::navigateToScreen(uint8_t displayIndex, uint8_t screenId) {
-    uiManager->setActiveScreen(displayIndex, screenId);
+bool MainUI::navigateToScreen(uint8_t displayIndex, uint8_t screenId) {
+    try {
+        bool result = uiManager->setActiveScreen(displayIndex, screenId);
+        
+        if (!result) {
+            REPORT_WARNING(ErrorCategory::UI, 
+                        "Failed to navigate to screen " + String(screenId) + 
+                        " on display " + String(displayIndex));
+        }
+        
+        return result;
+    }
+    catch (const std::exception& e) {
+        REPORT_ERROR(ErrorCategory::UI, ErrorSeverity::ERROR, 
+                   "Exception during screen navigation: " + String(e.what()));
+        return false;
+    }
+    catch (...) {
+        REPORT_ERROR(ErrorCategory::UI, ErrorSeverity::ERROR, 
+                   "Unknown exception during screen navigation");
+        return false;
+    }
+}
+
+void MainUI::showErrorMessage(const String& message, ErrorSeverity severity) {
+    // In a real implementation, this would show the error on the display
+    // For now, we just report it to the error handler
+    ErrorHandler::displayError(message, severity);
 }
 
 void MainUI::provideHapticFeedback(int duration) {
@@ -72,8 +138,8 @@ void MainUI::initMainMenu() {
     mainMenu = createStandardMenu();
     
     mainMenu->addItem("Apps", onAppsMenuSelected);
-    mainMenu->addItem("SYS Monitor", onSystemMonitorSelected);
-    mainMenu->addItem("IoT Control", onIoTControlSelected);
+    mainMenu->addItem("SYSTEM", onSystemMonitorSelected);
+    mainMenu->addItem("IoT DEV", onIoTControlSelected);
     mainMenu->addItem("Network", onNetworkMenuSelected);
     
     mainMenuScreen->addWidget(mainMenu);
@@ -208,14 +274,14 @@ void MainUI::onAppsMenuSelected(MenuWidget* menu) {
 
 void MainUI::onSystemMonitorSelected(MenuWidget* menu) {
     if (instance) {
-        instance->getAppTitle()->setTitle("MONITOR");
+        instance->getAppTitle()->setTitle("SYSTEM");
         instance->provideHapticFeedback(50);
     }
 }
 
 void MainUI::onIoTControlSelected(MenuWidget* menu) {
     if (instance) {
-        instance->getAppTitle()->setTitle("IOT CTRL");
+        instance->getAppTitle()->setTitle("IOT DEV");
         instance->provideHapticFeedback(50);
     }
 }

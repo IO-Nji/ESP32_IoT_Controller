@@ -126,10 +126,10 @@ void MenuWidget::draw(Adafruit_GFX& display) {
     }
 }
 
-void MenuWidget::update(unsigned long deltaTime) {
+bool MenuWidget::update(unsigned long deltaTime) {
     // Check if enough time has passed since last input
     if (millis() - lastInputTime < inputDelay) {
-        return;
+        return true; // Early exit is still a success
     }
     
     // Example of handling physical input (would need to be modified for your system)
@@ -138,6 +138,8 @@ void MenuWidget::update(unsigned long deltaTime) {
     // For demonstration purposes, we'll use a simple input handling method
     // In real usage, you'd call navigateNext(), navigatePrevious(), and selectCurrentItem() 
     // from your main program's input handling
+    
+    return true; // Update succeeded
 }
 
 int MenuWidget::addItem(const String& label, std::function<void(MenuWidget*)> callback, bool enabled) {

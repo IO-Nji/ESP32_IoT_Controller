@@ -49,8 +49,9 @@ public:
      * @brief Update the menu state
      * 
      * @param deltaTime Time elapsed since last update (milliseconds)
+     * @return true if update succeeded, false if failed
      */
-    virtual void update(unsigned long deltaTime) override;
+    virtual bool update(unsigned long deltaTime) override;
     
     /**
      * @brief Add a menu item

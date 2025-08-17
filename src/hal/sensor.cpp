@@ -31,9 +31,16 @@ bool hal_sensor_init() {
     return true;
 }
 
-void hal_sensor_update() {
-    // Get fresh readings from the sensor
-    mpu.getEvent(&accel, &gyro, &temp);
+bool hal_sensor_update() {
+    try {
+        // Get fresh readings from the sensor
+        mpu.getEvent(&accel, &gyro, &temp);
+        return true;
+    } 
+    catch (...) {
+        // Handle any sensor errors
+        return false;
+    }
 }
 
 float hal_sensor_read_accel_x() {
