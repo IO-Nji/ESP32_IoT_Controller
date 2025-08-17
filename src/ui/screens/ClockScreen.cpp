@@ -6,15 +6,18 @@
 
 ClockScreen::ClockScreen(Adafruit_SSD1306& display, TimeService& timeService, AlarmService& alarmService)
     : Screen(display, 128, 64), _timeService(timeService), _alarmService(alarmService) {
-    // Alarm widget at (40,2), textsize 1
+    // Alarm widget at (96,1), textsize 1
     alarmWidget = new AlarmWidget(96, 1, 48, 10, &_alarmService); // Position (96,1), width 48, height 10
-    // Time widget at (64,12), textsize 2
-    timeWidget = new TimeWidget(64, 12, 48, 20, &_timeService);   // Position (64,12), width 48, height 20
+    // Date widget at (2,2), size 32x32
+    dateWidget = new DateWidget(1, 1, 32, 32);
+    // Time widget at (66,12), textsize 2
+    timeWidget = new TimeWidget(66, 12, 48, 20, &_timeService);   // Position (66,12), width 48, height 20
     // Button labels at bottom
     infoButton = new ButtonLabelWidget(0, 64-12, 32, 12, "info", 1);
     backButton = new ButtonLabelWidget(96, 64-12, 32, 12, "back", 1);
     // Add widgets
     addWidget(alarmWidget);
+    addWidget(dateWidget);
     addWidget(timeWidget);
     addWidget(infoButton);
     addWidget(backButton);
@@ -48,10 +51,9 @@ void ClockScreen::updateWidgets() {
     static const char* days[] = {"SUN","MON","TUE","WED","THU","FRI","SAT"};
     static const char* months[] = {"JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"};
     uint8_t dayOfWeek = weekday(_timeService.getUnixTime()) - 1; // Arduino weekday: 1=Sunday
-    String dateText = String(days[dayOfWeek]) + "\n";
-    char dayStr[3];
-    sprintf(dayStr, "%02d", _timeService.getDay());
-    dateText += String(dayStr) + "\n";
-    dateText += String(months[_timeService.getMonth()-1]);
-    dateWidget->setText(dateText);
+    String dayStr = days[dayOfWeek];
+    char dayNum[3];
+    sprintf(dayNum, "%02d", _timeService.getDay());
+    String monthStr = months[_timeService.getMonth()-1];
+    dateWidget->setDate(dayStr, String(dayNum), monthStr);
 }

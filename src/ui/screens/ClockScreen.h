@@ -4,6 +4,7 @@
 #include "../../apps/TimeService.h"
 #include "../widgets/TimeWidget.h"
 #include "../widgets/AlarmWidget.h"
+#include "../widgets/DateWidget.h"
 #include "../../apps/AlarmService.h"
 #include "../LabelWidget.h"
 #include "../ButtonLabelWidget.h"
@@ -20,7 +21,7 @@ private:
     AlarmService& _alarmService;
     TimeWidget* timeWidget;
     AlarmWidget* alarmWidget;
-    LabelWidget* dateWidget;
+    DateWidget* dateWidget;
     ButtonLabelWidget* infoButton;
     ButtonLabelWidget* backButton;
     void updateWidgets();
