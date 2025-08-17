@@ -220,6 +220,12 @@ void MainUI::updateKeypadShortcuts(int screenId) {
             keypadShortcuts->setShortcut('#', "Next");
             keypadShortcuts->setShortcut('*', "Refresh");
             break;
+        case UI::CLOCK_SCREEN:
+            keypadShortcuts->setShortcut('A', "SET");
+            keypadShortcuts->setShortcut('B', "ALR");
+            keypadShortcuts->setShortcut('C', "WTR");
+            keypadShortcuts->setShortcut('D', "UPD");
+            break;
         default:
             keypadShortcuts->setShortcut('C', "Menu");
             keypadShortcuts->setShortcut('D', "Select");

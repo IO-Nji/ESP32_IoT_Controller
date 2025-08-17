@@ -3,6 +3,7 @@
 #include "../UIFramework.h"
 #include "../../apps/TimeService.h"
 #include "../widgets/TimeWidget.h"
+#include "../widgets/AlarmWidget.h"
 #include "../../apps/AlarmService.h"
 #include "../LabelWidget.h"
 #include "../ButtonLabelWidget.h"
@@ -18,7 +19,7 @@ private:
     TimeService& _timeService;
     AlarmService& _alarmService;
     TimeWidget* timeWidget;
-    LabelWidget* alarmWidget;
+    AlarmWidget* alarmWidget;
     LabelWidget* dateWidget;
     ButtonLabelWidget* infoButton;
     ButtonLabelWidget* backButton;

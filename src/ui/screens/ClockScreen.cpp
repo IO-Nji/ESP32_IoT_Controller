@@ -1,19 +1,20 @@
 #include "ClockScreen.h"
 #include "../widgets/TimeWidget.h"
+#include "../widgets/AlarmWidget.h"
 #include <Arduino.h>
 #include <TimeLib.h>
 
 ClockScreen::ClockScreen(Adafruit_SSD1306& display, TimeService& timeService, AlarmService& alarmService)
     : Screen(display, 128, 64), _timeService(timeService), _alarmService(alarmService) {
-    // Time widget at (40,12), textsize 2
-    timeWidget = new TimeWidget(40, 12, 48, 20, &_timeService);   // Position (40,12), width 48, height 20
-    // AlarmWidget and DateWidget are not implemented yet
-    // alarmWidget = new AlarmWidget(10, 52, 108, 10, &_alarmService); // Example position/size/args
-    // dateWidget = new DateWidget(10, 35, 108, 15, &_timeService);   // Example position/size/args
+    // Alarm widget at (40,2), textsize 1
+    alarmWidget = new AlarmWidget(96, 1, 48, 10, &_alarmService); // Position (96,1), width 48, height 10
+    // Time widget at (64,12), textsize 2
+    timeWidget = new TimeWidget(64, 12, 48, 20, &_timeService);   // Position (64,12), width 48, height 20
     // Button labels at bottom
     infoButton = new ButtonLabelWidget(0, 64-12, 32, 12, "info", 1);
     backButton = new ButtonLabelWidget(96, 64-12, 32, 12, "back", 1);
     // Add widgets
+    addWidget(alarmWidget);
     addWidget(timeWidget);
     addWidget(infoButton);
     addWidget(backButton);
