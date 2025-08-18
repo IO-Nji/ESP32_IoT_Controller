@@ -51,6 +51,8 @@ This project aims to build a versatile, industrial-grade IoT device using the ES
 - **Modern UI Framework:** Retained mode rendering, widget system
 - **Immediate Mode Elements:** For dynamic UI components
 - **Screen Management:** State persistence across screens
+- **Optimized Drawing:** Dirty rectangle tracking, double buffering, and event batching for high performance
+- **Async UI Updates:** Non-blocking UI refresh and input handling
 
 ### Phase 4: Application Architecture
 - **Application Base Class:** Common lifecycle and event handling
