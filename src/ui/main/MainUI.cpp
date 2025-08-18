@@ -1,6 +1,7 @@
 #include "MainUI.h"
 
 // Static instance for callbacks
+
 MainUI* MainUI::instance = nullptr;
 
 MainUI::MainUI(Adafruit_SSD1306& display1, Adafruit_SSD1306& display2) {
@@ -247,13 +248,17 @@ void MainUI::handleEncoderNavigation(long encoderValue, long lastEncoderValue) {
     // Handle encoder rotation
     if (encoderValue != lastEncoderValue) {
         long diff = encoderValue - lastEncoderValue;
-        
-        if (diff > 0) {
-            activeMenu->navigateNext();
-            provideHapticFeedback(20);
-        } else if (diff < 0) {
-            activeMenu->navigatePrevious();
-            provideHapticFeedback(20);
+        // First, let the active screen handle the event
+        bool handled = uiManager->handleInput(1, 'E', diff); // 'E' for encoder event
+        if (!handled) {
+            // If not handled, navigate menu
+            if (diff > 0) {
+                activeMenu->navigateNext();
+                provideHapticFeedback(20);
+            } else if (diff < 0) {
+                activeMenu->navigatePrevious();
+                provideHapticFeedback(20);
+            }
         }
     }
 }

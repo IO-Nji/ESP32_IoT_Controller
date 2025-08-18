@@ -11,14 +11,40 @@ void DateWidget::setDate(const String& dayOfWeek, const String& dayOfMonth, cons
 
 void DateWidget::draw(Adafruit_GFX& display) {
     display.setTextColor(SSD1306_WHITE);
-    display.drawRoundRect(x, y, width, height, 2, SSD1306_WHITE); // Border with radius 2
+    display.drawRoundRect(x, y, width, 42, 2, SSD1306_WHITE); // Border with radius 2, height 40
+
+    // Calculate heights for each line
+    int16_t x1, y1;
+    uint16_t w1, h1;
     display.setTextSize(1);
-    display.setCursor(x + 2, y + 2);
-    display.print(_dayOfWeek);
+    display.getTextBounds(_dayOfWeek, x, y, &x1, &y1, &w1, &h1);
+    uint16_t hDayOfWeek = h1;
     display.setTextSize(2);
-    display.setCursor(x + 2, y + 12);
-    display.print(_dayOfMonth);
+    display.getTextBounds(_dayOfMonth, x, y, &x1, &y1, &w1, &h1);
+    uint16_t hDayOfMonth = h1;
     display.setTextSize(1);
-    display.setCursor(x + 2, y + 28);
+    display.getTextBounds(_month, x, y, &x1, &y1, &w1, &h1);
+    uint16_t hMonth = h1;
+
+    uint16_t totalTextHeight = hDayOfWeek + hDayOfMonth + hMonth;
+    uint16_t boxHeight = 40;
+    int16_t yStart = y + (boxHeight - totalTextHeight) / 2;
+
+    // Draw day of week
+    display.setTextSize(1);
+    display.getTextBounds(_dayOfWeek, x, y, &x1, &y1, &w1, &h1);
+    display.setCursor(x + (width - w1) / 2, yStart);
+    display.print(_dayOfWeek);
+
+    // Draw day of month with 2px spacing
+    display.setTextSize(2);
+    display.getTextBounds(_dayOfMonth, x, y, &x1, &y1, &w1, &h1);
+    display.setCursor(x + (width - w1) / 2, yStart + hDayOfWeek + 2);
+    display.print(_dayOfMonth);
+
+    // Draw month with 2px spacing after day of month
+    display.setTextSize(1);
+    display.getTextBounds(_month, x, y, &x1, &y1, &w1, &h1);
+    display.setCursor(x + (width - w1) / 2, yStart + hDayOfWeek + hDayOfMonth + 4);
     display.print(_month);
 }

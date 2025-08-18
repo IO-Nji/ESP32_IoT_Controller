@@ -25,4 +25,10 @@ private:
     ButtonLabelWidget* infoButton;
     ButtonLabelWidget* backButton;
     void updateWidgets();
+
+    // Alarm setting state
+    bool settingAlarm = false;
+    int alarmHour = 0;
+    int alarmMinute = 0;
+    bool editingHour = true; // true: editing hour, false: editing minute
 };

@@ -3,6 +3,10 @@
 
 #include <Arduino.h>
 #include <Keypad.h>
+
+#ifndef NO_KEY
+#define NO_KEY '\0'
+#endif
 #include <ESP32Encoder.h>
 
 /**

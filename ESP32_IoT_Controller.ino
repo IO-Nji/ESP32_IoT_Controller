@@ -15,6 +15,7 @@
 // Include refactored components
 #include "src/ui/main/MainUI.h"
 #include "src/tasks/TaskManager.h"
+#include "src/ui/logo/logo.h"
 
 // Main UI instance
 MainUI* mainUI;
@@ -30,22 +31,28 @@ void setup() {
   hal_output_init();
   hal_sensor_init();
   
-  // Display startup message
-  hal_display_clear(0);
-  hal_display_draw_text(0, "ESP32", 0, 0, 1);
-  hal_display_draw_text(0, "Controller", 0, 10, 1);
-  hal_display_update(0);
-  
-  hal_display_clear(1);
-  hal_display_draw_text(1, "System", 32, 20, 1);
-  hal_display_draw_text(1, "Initializing", 32, 30, 1);
-  hal_display_update(1);
-  
-  delay(1000); // Show splash screen
-  
   // Get display references
   Adafruit_SSD1306* display1 = hal_display_get_display1();
   Adafruit_SSD1306* display2 = hal_display_get_display2();
+
+  // Display startup message on display1
+  hal_display_clear(0);
+  hal_display_draw_text(0, "ESP32", 0, 0, 1);
+  hal_display_draw_text(0, "IoT Control", 0, 10, 1);
+  hal_display_update(0);
+
+
+
+  // Animated logo on display2
+  logoDisplay(*display2,12,4);
+  display2->setTextSize(1);
+  display2->setTextColor(WHITE);
+  display2->setCursor(10, 42);
+  display2->print("System");
+  display2->setCursor(10, 52);
+  display2->print("Initialization");
+  display2->display();
+  delay(1000); // Show for 1 second
   
   // Initialize UI components
   mainUI = new MainUI(*display1, *display2);

@@ -24,7 +24,7 @@ bool InputManager::update() {
         processEncoderInput();
         processButtonInput();
         processEncoderButtonInput();
-        // processKeypadInput(); // To be implemented
+    processKeypadInput();
         
         // Reset error counter on successful update
         if (consecutiveErrors > 0) {
@@ -120,4 +120,12 @@ void InputManager::processEncoderButtonInput() {
 // To be implemented later
 void InputManager::processKeypadInput() {
     // Process matrix keypad input when available
+    char key = hal_input_read_keypad();
+    if (key != NO_KEY) {
+        // Route keypad event to active screen (display 1)
+        if (mainUI && mainUI->getUIManager()) {
+            mainUI->getUIManager()->handleInput(1, key, 0);
+        }
+        delay(150); // Debounce
+    }
 }
