@@ -1,9 +1,9 @@
 // src/ui/screens/ScheduleScreen.h
 #pragma once
 #include "../UIFramework.h"
-#include "../../apps/ScheduleService.h"
+#include "../../services/ScheduleService.h"
 
-class ScheduleScreen : public Screen {
+class ScheduleScreen : public BaseScreen {
 public:
     ScheduleScreen(Adafruit_SSD1306& display, ScheduleService& scheduleService);
 

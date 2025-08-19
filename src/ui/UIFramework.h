@@ -15,7 +15,7 @@
 #include "AppTitleWidget.h"
 #include "KeypadShortcutsWidget.h"
 #include "MenuWidget.h"
-#include "screens/Screen.h"
+#include "screens/BaseScreen.h"
 #include "screens/ClockScreen.h"
 #include "UIManager.h"
 

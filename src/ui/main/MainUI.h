@@ -103,6 +103,8 @@ private:
     MenuWidget* mainMenu;
     MenuWidget* appsMenu;
     MenuWidget* networkMenu;
+    // Menu stack for nested navigation
+    std::vector<MenuWidget*> menuStack;
 
     // Helper methods
     void initUIDisplays();
@@ -110,8 +112,9 @@ private:
     void initMainMenu();
     void initAppsMenu();
     void initNetworkMenu();
+    void initIoTDevMenu();
     MenuWidget* createStandardMenu();
-    void addButtonLabelsToScreen(Screen* screen);
+    void addButtonLabelsToScreen(BaseScreen* screen);
 
     // Menu callbacks
     static void onAppsMenuSelected(MenuWidget* menu);
@@ -120,6 +123,16 @@ private:
     static void onNetworkMenuSelected(MenuWidget* menu);
     static void onBackToMainSelected(MenuWidget* menu);
     static void onClockSelected(MenuWidget* menu);
+    static void onClockAppSelected(MenuWidget* menu);
+    static void onTimerAppSelected(MenuWidget* menu);
+    static void onPomodoroAppSelected(MenuWidget* menu);
+    static void onInputAppSelected(MenuWidget* menu);
+    static void onOutputAppSelected(MenuWidget* menu);
+    static void onSensorsAppSelected(MenuWidget* menu);
+    static void onConnectedDevicesAppSelected(MenuWidget* menu);
+    static void onNetworkStatusAppSelected(MenuWidget* menu);
+    static void onNetworkConfigAppSelected(MenuWidget* menu);
+    static void onWiFiConfigAppSelected(MenuWidget* menu);
 
     // Static reference for callbacks
     static MainUI* instance;

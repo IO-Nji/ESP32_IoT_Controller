@@ -5,7 +5,7 @@
 #include <TimeLib.h>
 
 ClockScreen::ClockScreen(Adafruit_SSD1306& display, TimeService& timeService, AlarmService& alarmService)
-    : Screen(display, 128, 64), _timeService(timeService), _alarmService(alarmService) {
+    : BaseScreen(display, 128, 64), _timeService(timeService), _alarmService(alarmService) {
     // Alarm widget at (96,1), textsize 1
     alarmWidget = new AlarmWidget(96, 1, 48, 10, &_alarmService); // Position (96,1), width 48, height 10
     // Date widget at (2,2), size 32x32
@@ -33,7 +33,7 @@ bool ClockScreen::update(unsigned long deltaTime) {
 }
 
 void ClockScreen::render() {
-    Screen::render();
+    BaseScreen::render();
 }
 
 bool ClockScreen::handleInput(uint8_t eventType, int32_t eventData) {

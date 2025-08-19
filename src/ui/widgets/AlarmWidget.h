@@ -1,6 +1,6 @@
 #pragma once
 #include "../Widget.h"
-#include "../../apps/AlarmService.h"
+#include "../../services/AlarmService.h"
 
 class AlarmWidget : public Widget {
 public:

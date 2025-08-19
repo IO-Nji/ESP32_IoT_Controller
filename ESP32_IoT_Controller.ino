@@ -1,3 +1,5 @@
+// Global flag for encoder button press
+bool encoderButtonPressed = false;
 /**
  * ESP32 IoT Controller
  * 

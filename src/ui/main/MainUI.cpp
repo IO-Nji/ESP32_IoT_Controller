@@ -1,4 +1,88 @@
 #include "MainUI.h"
+#include "../MenuWidget.h"
+
+// Stub implementations for new menu callbacks
+void MainUI::onClockAppSelected(MenuWidget* menu) {
+    if (instance) {
+        instance->navigateToScreen(1, UI::CLOCK_SCREEN);
+        instance->getAppTitle()->setTitle("CLOCK");
+        instance->updateKeypadShortcuts(UI::CLOCK_SCREEN);
+        instance->provideHapticFeedback(50);
+    }
+}
+void MainUI::onTimerAppSelected(MenuWidget* menu) {
+    if (instance) {
+        instance->navigateToScreen(1, UI::TIMER_SCREEN);
+        instance->getAppTitle()->setTitle("TIMER");
+        instance->updateKeypadShortcuts(UI::TIMER_SCREEN);
+        instance->provideHapticFeedback(50);
+    }
+}
+void MainUI::onPomodoroAppSelected(MenuWidget* menu) {
+    if (instance) {
+        instance->navigateToScreen(1, UI::POMODORO_SCREEN);
+        instance->getAppTitle()->setTitle("POMODORO");
+        instance->updateKeypadShortcuts(UI::POMODORO_SCREEN);
+        instance->provideHapticFeedback(50);
+    }
+}
+void MainUI::onInputAppSelected(MenuWidget* menu) {
+    if (instance) {
+        instance->navigateToScreen(1, UI::INPUT_SCREEN);
+        instance->getAppTitle()->setTitle("INPUT");
+        instance->updateKeypadShortcuts(UI::INPUT_SCREEN);
+        instance->provideHapticFeedback(50);
+    }
+}
+void MainUI::onOutputAppSelected(MenuWidget* menu) {
+    if (instance) {
+        instance->navigateToScreen(1, UI::OUTPUT_SCREEN);
+        instance->getAppTitle()->setTitle("OUTPUT");
+        instance->updateKeypadShortcuts(UI::OUTPUT_SCREEN);
+        instance->provideHapticFeedback(50);
+    }
+}
+void MainUI::onSensorsAppSelected(MenuWidget* menu) {
+    if (instance) {
+        instance->navigateToScreen(1, UI::SENSORS_SCREEN);
+        instance->getAppTitle()->setTitle("SENSORS");
+        instance->updateKeypadShortcuts(UI::SENSORS_SCREEN);
+        instance->provideHapticFeedback(50);
+    }
+}
+void MainUI::onConnectedDevicesAppSelected(MenuWidget* menu) {
+    if (instance) {
+        instance->navigateToScreen(1, UI::CONNECTED_DEVICES_SCREEN);
+        instance->getAppTitle()->setTitle("CONNECTED DEVICES");
+        instance->updateKeypadShortcuts(UI::CONNECTED_DEVICES_SCREEN);
+        instance->provideHapticFeedback(50);
+    }
+}
+void MainUI::onNetworkStatusAppSelected(MenuWidget* menu) {
+    if (instance) {
+        instance->navigateToScreen(1, UI::NETWORK_STATUS_SCREEN);
+        instance->getAppTitle()->setTitle("NETWORK STATUS");
+        instance->updateKeypadShortcuts(UI::NETWORK_STATUS_SCREEN);
+        instance->provideHapticFeedback(50);
+    }
+}
+void MainUI::onNetworkConfigAppSelected(MenuWidget* menu) {
+    if (instance) {
+        instance->navigateToScreen(1, UI::NETWORK_CONFIG_SCREEN);
+        instance->getAppTitle()->setTitle("NETWORK CONFIG");
+        instance->updateKeypadShortcuts(UI::NETWORK_CONFIG_SCREEN);
+        instance->provideHapticFeedback(50);
+    }
+}
+void MainUI::onWiFiConfigAppSelected(MenuWidget* menu) {
+    if (instance) {
+        instance->navigateToScreen(1, UI::WIFI_CONFIG_SCREEN);
+        instance->getAppTitle()->setTitle("WIFI CONFIG");
+        instance->updateKeypadShortcuts(UI::WIFI_CONFIG_SCREEN);
+        instance->provideHapticFeedback(50);
+    }
+}
+#include "MainUI.h"
 
 // Static instance for callbacks
 
@@ -29,11 +113,46 @@ void MainUI::setup() {
         
         // Configure initial shortcuts
         updateKeypadShortcuts(UI::MAIN_SCREEN);
-        
         // Force an immediate update
         uiManager->update(0);
-        
         REPORT_INFO("UI setup completed successfully");
+        // Initialize menu stack with main menu
+        menuStack.clear();
+        menuStack.push_back(mainMenu);
+        // Set menu selection callback for main menu and all sub-menus
+        auto menuSelectHandler = [this](const MenuWidget::MenuItem& item) {
+            if (item.subMenu) {
+                // Sub-menu selected: push to stack, update screen, title, shortcuts
+                menuStack.push_back(item.subMenu);
+                BaseScreen* screen = uiManager->getScreen(1, uiManager->getActiveScreenId(1));
+                screen->removeWidget(menuStack[menuStack.size()-2]);
+                screen->addWidget(item.subMenu);
+                if (appTitle) appTitle->setTitle(item.label);
+                if (keypadShortcuts) {
+                    keypadShortcuts->clearShortcuts();
+                    keypadShortcuts->setShortcut('A', "Home");
+                    keypadShortcuts->setShortcut('B', "Back");
+                    keypadShortcuts->setShortcut('C', "Select");
+                    keypadShortcuts->setShortcut('D', "Menu");
+                }
+            } else if (item.callback) {
+                // App item selected: callback will handle screen/context
+                item.callback(menuStack.back());
+            }
+            provideHapticFeedback(50);
+        };
+        mainMenu->setMenuItemSelectedCallback(menuSelectHandler);
+        // Recursively set callback for all sub-menus
+        std::function<void(MenuWidget*)> setCallbackRecursively = [&](MenuWidget* menu) {
+            menu->setMenuItemSelectedCallback(menuSelectHandler);
+            const auto& menuItems = menu->getItems();
+            for (int i = 0; i < menuItems.size(); ++i) {
+                if (menuItems[i].subMenu) {
+                    setCallbackRecursively(menuItems[i].subMenu);
+                }
+            }
+        };
+        setCallbackRecursively(mainMenu);
     }
     catch (const std::exception& e) {
         REPORT_CRITICAL(ErrorCategory::UI, "Exception during UI setup: " + String(e.what()));
@@ -115,7 +234,7 @@ void MainUI::provideHapticFeedback(int duration) {
 
 void MainUI::initUIDisplays() {
     // Setup display 1 (vertical 128x32)
-    Screen* display1Screen = uiManager->createScreen(0, UI::MAIN_SCREEN);
+    BaseScreen* display1Screen = uiManager->createScreen(0, UI::MAIN_SCREEN);
     appTitle = new AppTitleWidget(0, 0, 32, 26, "ESP32 IOT");
     keypadShortcuts = new KeypadShortcutsWidget(0, 128 - 64, 32, 64);
     
@@ -137,42 +256,94 @@ void MainUI::initUIDisplays() {
 void MainUI::initUIMenus() {
     initMainMenu();
     initAppsMenu();
+    initIoTDevMenu();
     initNetworkMenu();
 }
 
 void MainUI::initMainMenu() {
-    Screen* mainMenuScreen = uiManager->getScreen(1, UI::MAIN_SCREEN);
+    BaseScreen* mainMenuScreen = uiManager->getScreen(1, UI::MAIN_SCREEN);
     mainMenu = createStandardMenu();
-    
-    mainMenu->addItem("Apps", onAppsMenuSelected);
-    mainMenu->addItem("System", onSystemMonitorSelected);
-    mainMenu->addItem("IoT DEVs", onIoTControlSelected);
-    mainMenu->addItem("Network", onNetworkMenuSelected);
-    
+    // Apps (menu)
+    MenuWidget* appsMenu = createStandardMenu();
+    appsMenu->addItem("Clock", onClockAppSelected);
+    appsMenu->addItem("Timer", onTimerAppSelected);
+    appsMenu->addItem("Pomodoro Timer", onPomodoroAppSelected);
+    mainMenu->addSubMenu("Apps", appsMenu);
+
+    // SYS Info (application)
+    mainMenu->addItem("SYS Info", onSystemMonitorSelected);
+
+    // IoT DEV (menu)
+    MenuWidget* iotDevMenu = createStandardMenu();
+    // System (menu)
+    MenuWidget* systemMenu = createStandardMenu();
+    systemMenu->addItem("Input", onInputAppSelected);
+    systemMenu->addItem("Output", onOutputAppSelected);
+    systemMenu->addItem("Sensors", onSensorsAppSelected);
+    iotDevMenu->addSubMenu("System", systemMenu);
+    // Network (menu)
+    MenuWidget* iotNetworkMenu = createStandardMenu();
+    iotNetworkMenu->addItem("Connected Devices", onConnectedDevicesAppSelected);
+    iotDevMenu->addSubMenu("Network", iotNetworkMenu);
+    mainMenu->addSubMenu("IoT DEV", iotDevMenu);
+
+    // Network (menu)
+    MenuWidget* networkMenu = createStandardMenu();
+    networkMenu->addItem("Status", onNetworkStatusAppSelected);
+    networkMenu->addItem("Config", onNetworkConfigAppSelected);
+    networkMenu->addItem("WiFi", onWiFiConfigAppSelected);
+    mainMenu->addSubMenu("Network", networkMenu);
+
     mainMenuScreen->addWidget(mainMenu);
     addButtonLabelsToScreen(mainMenuScreen);
 }
 
 void MainUI::initAppsMenu() {
-    Screen* appsMenuScreen = uiManager->getScreen(1, UI::APPS_MENU);
+    BaseScreen* appsMenuScreen = uiManager->getScreen(1, UI::APPS_MENU);
     appsMenu = createStandardMenu();
-    
-    appsMenu->addItem("Clock", onClockSelected);
-    appsMenu->addItem("Timer", nullptr);
+
+    // Clock sub-menu
+    MenuWidget* clockMenu = createStandardMenu();
+    clockMenu->addItem("Clock", nullptr);
+    clockMenu->addItem("Weather", nullptr);
+    clockMenu->addItem("Alarm", nullptr);
+
+    // Timer sub-menu
+    MenuWidget* timerMenu = createStandardMenu();
+    timerMenu->addItem("StopWatch", nullptr);
+    timerMenu->addItem("CountDown", nullptr);
+    appsMenu->addSubMenu("Timer", timerMenu);
+
+    // Pomodoro Timer
     appsMenu->addItem("Pomodoro", nullptr);
-    
     appsMenuScreen->addWidget(appsMenu);
     addButtonLabelsToScreen(appsMenuScreen);
 }
+// IoT DEV menu and sub-menus
+void MainUI::initIoTDevMenu() {
+    BaseScreen* iotDevMenuScreen = uiManager->createScreen(1, UI::IOT_DEV_MENU);
+    MenuWidget* iotDevMenu = createStandardMenu();
+    // System sub-menu
+    MenuWidget* systemMenu = createStandardMenu();
+    systemMenu->addItem("IMU Read", nullptr);
+    systemMenu->addItem("RGB LED", nullptr);
+    systemMenu->addItem("POT Read", nullptr);
+    systemMenu->addItem("JoyStick", nullptr);
+    iotDevMenu->addSubMenu("System", systemMenu);
+    // Network sub-menu
+    MenuWidget* iotNetworkMenu = createStandardMenu();
+    iotNetworkMenu->addItem("Connected Devices", nullptr);
+    iotDevMenu->addSubMenu("Network", iotNetworkMenu);
+    iotDevMenuScreen->addWidget(iotDevMenu);
+    addButtonLabelsToScreen(iotDevMenuScreen);
+}
 
 void MainUI::initNetworkMenu() {
-    Screen* networkMenuScreen = uiManager->getScreen(1, UI::NETWORK_MENU);
+    BaseScreen* networkMenuScreen = uiManager->getScreen(1, UI::NETWORK_MENU);
     networkMenu = createStandardMenu();
-    
-    networkMenu->addItem("NET Status", nullptr);
-    networkMenu->addItem("NET Config", nullptr);
-    networkMenu->addItem("WiFi Setup", nullptr);
-    
+    networkMenu->addItem("Status", nullptr);
+    networkMenu->addItem("Config", nullptr);
+    networkMenu->addItem("WiFi", nullptr);
     networkMenuScreen->addWidget(networkMenu);
     addButtonLabelsToScreen(networkMenuScreen);
 }
@@ -182,7 +353,7 @@ MenuWidget* MainUI::createStandardMenu() {
                          UI::Layout::MENU_WIDTH, UI::Layout::MENU_HEIGHT, "");
 }
 
-void MainUI::addButtonLabelsToScreen(Screen* screen) {
+void MainUI::addButtonLabelsToScreen(BaseScreen* screen) {
     using namespace UI::Layout;
     
     screen->addWidget(new ButtonLabelWidget(
@@ -216,7 +387,7 @@ void MainUI::updateKeypadShortcuts(int screenId) {
             keypadShortcuts->setShortcut('*', "Prev");
             break;
         case UI::NETWORK_MENU:
-            keypadShortcuts->setShortcut('C', "Connect");
+            keypadShortcuts->setShortcut('C', "Con");
             keypadShortcuts->setShortcut('D', "Scan");
             keypadShortcuts->setShortcut('#', "Next");
             keypadShortcuts->setShortcut('*', "Refresh");
@@ -235,23 +406,12 @@ void MainUI::updateKeypadShortcuts(int screenId) {
 }
 
 void MainUI::handleEncoderNavigation(long encoderValue, long lastEncoderValue) {
-    // Get active menu based on screen
-    int activeScreenId = uiManager->getActiveScreenId(1);
-    MenuWidget* activeMenu = mainMenu;
-    
-    if (activeScreenId == UI::APPS_MENU) {
-        activeMenu = appsMenu;
-    } else if (activeScreenId == UI::NETWORK_MENU) {
-        activeMenu = networkMenu;
-    }
-    
-    // Handle encoder rotation
+    MenuWidget* activeMenu = menuStack.empty() ? nullptr : menuStack.back();
+    if (!activeMenu) return;
     if (encoderValue != lastEncoderValue) {
         long diff = encoderValue - lastEncoderValue;
-        // First, let the active screen handle the event
-        bool handled = uiManager->handleInput(1, 'E', diff); // 'E' for encoder event
+        bool handled = uiManager->handleInput(1, 'E', diff);
         if (!handled) {
-            // If not handled, navigate menu
             if (diff > 0) {
                 activeMenu->navigateNext();
                 provideHapticFeedback(20);
@@ -261,19 +421,37 @@ void MainUI::handleEncoderNavigation(long encoderValue, long lastEncoderValue) {
             }
         }
     }
+    extern bool encoderButtonPressed;
+    if (encoderButtonPressed) {
+        activeMenu->selectCurrentItem();
+        encoderButtonPressed = false;
+    }
 }
 
 void MainUI::handleButtonPress(int buttonId) {
-    // Get active screen ID
-    int activeScreenId = uiManager->getActiveScreenId(1);
-    
-    // Handle physical buttons
+    // Handle Home and Back buttons for menu stack navigation
     if (buttonId == 1) {  // Home button
-        if (activeScreenId != UI::MAIN_SCREEN) {
-            onBackToMainSelected(nullptr);
+        // Go to root menu
+        if (menuStack.size() > 1) {
+            // Remove all menu widgets from display2
+            BaseScreen* screen = uiManager->getScreen(1, uiManager->getActiveScreenId(1));
+            for (auto it = menuStack.rbegin(); it != menuStack.rend(); ++it) {
+                screen->removeWidget(*it);
+            }
+            menuStack.clear();
+            menuStack.push_back(mainMenu);
+            screen->addWidget(mainMenu);
         }
+        onBackToMainSelected(nullptr);
     } else if (buttonId == 2) {  // Back button
-        if (activeScreenId != UI::MAIN_SCREEN) {
+        // Pop menu stack if possible
+        if (menuStack.size() > 1) {
+            BaseScreen* screen = uiManager->getScreen(1, uiManager->getActiveScreenId(1));
+            screen->removeWidget(menuStack.back());
+            menuStack.pop_back();
+            screen->addWidget(menuStack.back());
+            if (appTitle) appTitle->setTitle(menuStack.back()->getTitle());
+        } else {
             onBackToMainSelected(nullptr);
         }
     }
@@ -330,5 +508,4 @@ void MainUI::onClockSelected(MenuWidget* menu) {
     }
 }
 
-// Example: Add ClockScreen to UIManager
-// ...existing code...
+

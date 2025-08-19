@@ -1,6 +1,6 @@
 #pragma once
-#include "../screens/Screen.h"
-#include "../../apps/TimeService.h"
+#include "../screens/BaseScreen.h"
+#include "../../services/TimeService.h"
 
 class TimeWidget : public Widget {
 public:

@@ -9,7 +9,17 @@ namespace UI {
         MAIN_SCREEN = 0,
         APPS_MENU = 1,
         NETWORK_MENU = 2,
-        CLOCK_SCREEN = 3
+        CLOCK_SCREEN = 3,
+        IOT_DEV_MENU = 4,
+        TIMER_SCREEN = 5,
+        POMODORO_SCREEN = 6,
+        INPUT_SCREEN = 7,
+        OUTPUT_SCREEN = 8,
+        SENSORS_SCREEN = 9,
+        CONNECTED_DEVICES_SCREEN = 10,
+        NETWORK_STATUS_SCREEN = 11,
+        NETWORK_CONFIG_SCREEN = 12,
+        WIFI_CONFIG_SCREEN = 13
     };
     
     // UI component dimensions

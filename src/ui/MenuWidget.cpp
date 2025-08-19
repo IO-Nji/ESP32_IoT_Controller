@@ -1,6 +1,11 @@
 #include "MenuWidget.h"
 #include <Arduino.h>
 
+int MenuWidget::addSubMenu(const String& label, MenuWidget* subMenu) {
+    items.push_back(MenuItem(label, nullptr, true, subMenu));
+    return items.size() - 1;
+}
+
 MenuWidget::MenuWidget(int16_t x, int16_t y, int16_t width, int16_t height,
                        const String& title, bool visible)
     : Widget(x, y, width, height, visible), title(title) {
@@ -144,12 +149,8 @@ bool MenuWidget::update(unsigned long deltaTime) {
 
 int MenuWidget::addItem(const String& label, std::function<void(MenuWidget*)> callback, bool enabled) {
     items.push_back(MenuItem(label, callback, enabled));
-    
-    // If this is the first item, select it
-    if (items.size() == 1) {
-        currentIndex = 0;
-    }
-    
+    // Ensure cursor is always visible
+    if (currentIndex == -1 && !items.empty()) currentIndex = 0;
     return items.size() - 1;
 }
 
@@ -206,16 +207,17 @@ bool MenuWidget::selectCurrentItem() {
     if (items.empty() || currentIndex < 0 || currentIndex >= items.size()) {
         return false;
     }
-    
     if (!items[currentIndex].enabled) {
         return false; // Can't select disabled items
     }
-    
+    // Call the menu selection callback if set
+    if (onMenuItemSelected) {
+        onMenuItemSelected(items[currentIndex]);
+    }
     // Call the item's callback function if available
     if (items[currentIndex].callback) {
         items[currentIndex].callback(this);
     }
-    
     lastInputTime = millis();
     return true;
 }

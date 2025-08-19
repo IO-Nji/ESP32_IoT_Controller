@@ -68,3 +68,4 @@ void AlarmService::update() {
         }
     }
 }
+#include "AlarmService.h"

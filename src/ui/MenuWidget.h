@@ -12,18 +12,23 @@
  * It supports navigation through items and selection callbacks.
  */
 class MenuWidget : public Widget {
+
+
+
 public:
-    /**
-     * @brief Menu item structure
-     */
     struct MenuItem {
-        String label;                                  ///< Text label for the menu item
-        std::function<void(MenuWidget*)> callback;     ///< Callback function when item is selected
-        bool enabled = true;                           ///< Whether the item is enabled
-        
-        MenuItem(const String& label, std::function<void(MenuWidget*)> callback, bool enabled = true)
-            : label(label), callback(callback), enabled(enabled) {}
+        String label;
+        std::function<void(MenuWidget*)> callback;
+        bool enabled = true;
+        MenuWidget* subMenu = nullptr;
+
+        MenuItem(const String& label, std::function<void(MenuWidget*)> callback, bool enabled = true, MenuWidget* subMenu = nullptr)
+            : label(label), callback(callback), enabled(enabled), subMenu(subMenu) {}
     };
+
+
+    // Add a sub-menu as a selectable menu item
+    int addSubMenu(const String& label, MenuWidget* subMenu);
 
     /**
      * @brief Construct a new Menu Widget
@@ -45,12 +50,12 @@ public:
      */
     virtual void draw(Adafruit_GFX& display) override;
     
-    /**
-     * @brief Update the menu state
-     * 
-     * @param deltaTime Time elapsed since last update (milliseconds)
-     * @return true if update succeeded, false if failed
-     */
+
+    // Get a menu item by index (const)
+    const MenuItem* getItem(int index) const {
+        if (index < 0 || index >= items.size()) return nullptr;
+        return &items[index];
+    }
     virtual bool update(unsigned long deltaTime) override;
     
     /**
@@ -149,6 +154,13 @@ public:
      * @param show Show scrollbar flag
      */
     void setShowScrollbar(bool show);
+
+    // Add a menu selection callback for integration with MainUI
+    std::function<void(const MenuItem&)> onMenuItemSelected;
+
+    void setMenuItemSelectedCallback(std::function<void(const MenuItem&)> cb) { onMenuItemSelected = cb; }
+
+    const std::vector<MenuItem>& getItems() const { return items; }
 
 private:
     String title;                      ///< Menu title

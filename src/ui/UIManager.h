@@ -6,7 +6,7 @@
 #include <Adafruit_SSD1306.h>
 #include <map>
 #include <memory>
-#include "screens/Screen.h"
+#include "screens/BaseScreen.h"
 
 /**
  * @brief UI Manager for multiple displays and screens
@@ -31,7 +31,7 @@ public:
      * @param screenId Unique identifier for the screen
      * @return Screen* Pointer to the newly created screen
      */
-    Screen* createScreen(uint8_t displayIndex, uint8_t screenId);
+    BaseScreen* createScreen(uint8_t displayIndex, uint8_t screenId);
 
     /**
      * @brief Set the active screen for a display
@@ -49,7 +49,7 @@ public:
      * @param displayIndex Display index (0 for display1, 1 for display2)
      * @return Screen* Pointer to active screen or nullptr if none
      */
-    Screen* getActiveScreen(uint8_t displayIndex);
+    BaseScreen* getActiveScreen(uint8_t displayIndex);
 
     /**
      * @brief Get the active screen ID for a display
@@ -66,7 +66,7 @@ public:
      * @param screenId Screen identifier to retrieve
      * @return Screen* Pointer to the screen or nullptr if not found
      */
-    Screen* getScreen(uint8_t displayIndex, uint8_t screenId);
+    BaseScreen* getScreen(uint8_t displayIndex, uint8_t screenId);
 
     /**
      * @brief Update all active screens
@@ -113,7 +113,7 @@ public:
      * @param screenId Screen identifier
      * @param screen Pointer to the screen object
      */
-    void addScreen(uint8_t displayIndex, uint8_t screenId, Screen* screen);
+    void addScreen(uint8_t displayIndex, uint8_t screenId, BaseScreen* screen);
 
     /**
      * @brief Get the display object for a given index
@@ -136,8 +136,8 @@ private:
     uint8_t activeScreen2;
 
     // Maps of screenId to Screen object for each display
-    std::map<uint8_t, std::unique_ptr<Screen>> screens1;
-    std::map<uint8_t, std::unique_ptr<Screen>> screens2;
+    std::map<uint8_t, std::unique_ptr<BaseScreen>> screens1;
+    std::map<uint8_t, std::unique_ptr<BaseScreen>> screens2;
 };
 
 #endif // UI_MANAGER_H

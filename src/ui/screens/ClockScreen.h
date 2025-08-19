@@ -1,15 +1,15 @@
 // src/ui/screens/ClockScreen.h
 #pragma once
 #include "../UIFramework.h"
-#include "../../apps/TimeService.h"
+#include "../../services/TimeService.h"
 #include "../widgets/TimeWidget.h"
 #include "../widgets/AlarmWidget.h"
 #include "../widgets/DateWidget.h"
-#include "../../apps/AlarmService.h"
+#include "../../services/AlarmService.h"
 #include "../LabelWidget.h"
 #include "../ButtonLabelWidget.h"
 
-class ClockScreen : public Screen {
+class ClockScreen : public BaseScreen {
 public:
     ClockScreen(Adafruit_SSD1306& display, TimeService& timeService, AlarmService& alarmService);
     bool update(unsigned long deltaTime);
