@@ -3,7 +3,7 @@
 LabelWidget::LabelWidget(int16_t x, int16_t y, int16_t width, int16_t height,
                        const String& text, uint8_t textSize,
                        Alignment alignment, bool visible)
-    : Widget(x, y, width, height, visible),
+    : BaseWidget(x, y, width, height, visible),
       text(text),
       textSize(textSize),
       alignment(alignment),

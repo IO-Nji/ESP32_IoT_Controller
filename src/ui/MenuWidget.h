@@ -1,7 +1,12 @@
+
 #ifndef MENU_WIDGET_H
 #define MENU_WIDGET_H
 
-#include "Widget.h"
+#include <Arduino.h>
+#include <Adafruit_GFX.h>
+#include "BaseWidget.h"
+
+// ...existing code...
 #include <vector>
 #include <functional>
 
@@ -11,7 +16,7 @@
  * This widget displays a scrollable list of menu items that can be selected.
  * It supports navigation through items and selection callbacks.
  */
-class MenuWidget : public Widget {
+class MenuWidget : public BaseWidget {
 
 
 

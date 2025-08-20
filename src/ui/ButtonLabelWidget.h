@@ -1,7 +1,12 @@
+
 #ifndef BUTTON_LABEL_WIDGET_H
 #define BUTTON_LABEL_WIDGET_H
 
-#include "Widget.h"
+#include <Arduino.h>
+#include <Adafruit_GFX.h>
+#include "BaseWidget.h"
+
+// ...existing code...
 #include "../hal/hal_config.h"
 
 /**
@@ -9,7 +14,7 @@
  * 
  * This widget displays text inside a border to indicate a button function.
  */
-class ButtonLabelWidget : public Widget {
+class ButtonLabelWidget : public BaseWidget {
 public:
     /**
      * @brief Construct a new Button Label Widget

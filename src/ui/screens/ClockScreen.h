@@ -1,6 +1,6 @@
 // src/ui/screens/ClockScreen.h
 #pragma once
-#include "../UIFramework.h"
+#include "BaseScreen.h"
 #include "../../services/TimeService.h"
 #include "../widgets/TimeWidget.h"
 #include "../widgets/AlarmWidget.h"

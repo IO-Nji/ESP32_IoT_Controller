@@ -1,5 +1,5 @@
-#ifndef WIDGET_H
-#define WIDGET_H
+#ifndef BASE_WIDGET_H
+#define BASE_WIDGET_H
 
 #include <Arduino.h>
 #include <Adafruit_SSD1306.h>
@@ -13,7 +13,7 @@
  * It handles positioning, sizing, and basic rendering functions.
  * Specific widget types should inherit from this class and override the draw method.
  */
-class Widget {
+class BaseWidget {
 public:
     /**
      * @brief Construct a new Widget object
@@ -24,9 +24,9 @@ public:
      * @param height Height of the widget
      * @param visible Initial visibility state
      */
-    Widget(int16_t x, int16_t y, int16_t width, int16_t height, bool visible = true);
+    BaseWidget(int16_t x, int16_t y, int16_t width, int16_t height, bool visible = true);
     
-    virtual ~Widget() = default;
+    virtual ~BaseWidget() = default;
     
     /**
      * @brief Draw the widget on the specified display
@@ -130,14 +130,14 @@ public:
      * 
      * @param parent Pointer to parent widget
      */
-    void setParent(Widget* parent);
+    void setParent(BaseWidget* parent);
     
     /**
      * @brief Get the parent widget
      * 
      * @return Widget* Pointer to parent widget, or nullptr if no parent
      */
-    Widget* getParent() const;
+    BaseWidget* getParent() const;
     
     /**
      * @brief Get X position
@@ -176,7 +176,7 @@ public:
     void getAbsolutePosition(int16_t& absX, int16_t& absY) const {
         absX = x;
         absY = y;
-        const Widget* currentParent = parent;
+        const BaseWidget* currentParent = parent;
         while (currentParent) {
             absX += currentParent->x;
             absY += currentParent->y;
@@ -190,7 +190,7 @@ protected:
     int16_t width;        ///< Widget width
     int16_t height;       ///< Widget height
     bool visible;         ///< Visibility flag
-    Widget* parent;       ///< Parent widget, or nullptr if root widget
+    BaseWidget* parent;       ///< Parent widget, or nullptr if root widget
 };
 
-#endif // WIDGET_H
+#endif // BASE_WIDGET_H

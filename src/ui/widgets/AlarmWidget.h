@@ -1,8 +1,8 @@
 #pragma once
-#include "../Widget.h"
+#include "../BaseWidget.h"
 #include "../../services/AlarmService.h"
 
-class AlarmWidget : public Widget {
+class AlarmWidget : public BaseWidget {
 public:
     AlarmWidget(int16_t x, int16_t y, int16_t w, int16_t h, AlarmService* alarmService);
         void setText(const String& text);

@@ -4,7 +4,7 @@
 
 AppTitleWidget::AppTitleWidget(int16_t x, int16_t y, int16_t width, int16_t height,
                              const String& title, bool visible)
-    : Widget(x, y, width, height, visible), title(title) {
+    : BaseWidget(x, y, width, height, visible), title(title) {
     generateAbbreviation();
 }
 

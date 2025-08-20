@@ -2,7 +2,7 @@
 #include <Adafruit_GFX.h>
 
 AlarmWidget::AlarmWidget(int16_t x, int16_t y, int16_t w, int16_t h, AlarmService* alarmService)
-    : Widget(x, y, w, h), _alarmService(alarmService) {}
+    : BaseWidget(x, y, w, h), _alarmService(alarmService) {}
 
 void AlarmWidget::draw(Adafruit_GFX& display) {
     String alarmText = "00:00";
@@ -16,6 +16,6 @@ void AlarmWidget::draw(Adafruit_GFX& display) {
     }
     display.setTextSize(1);
     display.setTextColor(SSD1306_WHITE);
-    display.setCursor(x, y);
+    display.setCursor(this->getX(), this->getY());
     display.print(alarmText);
 }

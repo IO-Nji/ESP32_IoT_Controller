@@ -8,6 +8,9 @@
 #include "../../hal/output.h"
 #include "../../util/ErrorHandler.h"
 
+// Forward declarations
+class ClockScreen;
+
 class MainUI {
 public:
     /**

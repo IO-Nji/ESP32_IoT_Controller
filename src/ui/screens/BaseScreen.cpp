@@ -4,28 +4,28 @@
 BaseScreen::BaseScreen(Adafruit_SSD1306& display, uint16_t width, uint16_t height)
     : display(display), width(width), height(height) {}
 
-void BaseScreen::addWidget(Widget* widget) {
-    if (widget) {
-        widgets.push_back(widget);
-    }
+void BaseScreen::addWidget(BaseWidget* widget) {
+        if (widget) {
+            widgets.push_back(widget);
+        }
 }
 
-bool BaseScreen::removeWidget(Widget* widget) {
-    for (auto it = widgets.begin(); it != widgets.end(); ++it) {
-        if (*it == widget) {
-            widgets.erase(it);
-            return true;
+bool BaseScreen::removeWidget(BaseWidget* widget) {
+        for (auto it = widgets.begin(); it != widgets.end(); ++it) {
+            if (*it == widget) {
+                widgets.erase(it);
+                return true;
+            }
         }
-    }
-    return false;
+        return false;
 }
 
 void BaseScreen::render() {
     display.clearDisplay();
-    for (Widget* widget : widgets) {
-        widget->draw(display);
-    }
-    display.display();
+        for (BaseWidget* widget : widgets) {
+            widget->draw(display);
+        }
+        display.display();
 }
 
 void BaseScreen::saveState(JsonDocument& state) {
@@ -43,11 +43,11 @@ void BaseScreen::loadState(const JsonDocument& state) {
 bool BaseScreen::update(unsigned long deltaTime) {
     bool success = true;
     try {
-        for (Widget* widget : widgets) {
-            if (!widget->update(deltaTime)) {
-                success = false;
+            for (BaseWidget* widget : widgets) {
+                if (!widget->update(deltaTime)) {
+                    success = false;
+                }
             }
-        }
     } catch (...) {
         success = false;
     }

@@ -3,7 +3,7 @@
 #include "../hal/hal_config.h"
 
 KeypadShortcutsWidget::KeypadShortcutsWidget(int16_t x, int16_t y, int16_t width, int16_t height, bool visible)
-    : Widget(x, y, width, height, visible), shortcutCount(0) {
+    : BaseWidget(x, y, width, height, visible), shortcutCount(0) {
     // Initialize arrays
     for (uint8_t i = 0; i < MAX_SHORTCUTS; i++) {
         keys[i] = '\0';

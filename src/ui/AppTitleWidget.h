@@ -1,7 +1,12 @@
+
 #ifndef APP_TITLE_WIDGET_H
 #define APP_TITLE_WIDGET_H
 
-#include "Widget.h"
+#include <Arduino.h>
+#include <Adafruit_GFX.h>
+#include "BaseWidget.h"
+
+// ...existing code...
 
 /**
  * @brief A widget for displaying an application title with abbreviated subtitle
@@ -9,7 +14,7 @@
  * This widget shows a title in all caps at the top, and a 2-character
  * abbreviated version of the title centered below it.
  */
-class AppTitleWidget : public Widget {
+class AppTitleWidget : public BaseWidget {
 public:
     /**
      * @brief Construct a new App Title Widget

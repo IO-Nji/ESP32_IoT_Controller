@@ -8,7 +8,7 @@ int MenuWidget::addSubMenu(const String& label, MenuWidget* subMenu) {
 
 MenuWidget::MenuWidget(int16_t x, int16_t y, int16_t width, int16_t height,
                        const String& title, bool visible)
-    : Widget(x, y, width, height, visible), title(title) {
+    : BaseWidget(x, y, width, height, visible), title(title) {
     // Force exactly 4 visible items for all menus
     visibleItemsCount = 4;
     

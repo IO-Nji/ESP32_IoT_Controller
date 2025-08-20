@@ -14,9 +14,9 @@ AnimatedDashboardScreen::AnimatedDashboardScreen(Adafruit_SSD1306& display)
     : display(display),
       width(display.width()),
       height(display.height()),
-      titleWidget(nullptr),
-      statusWidget(nullptr),
-      menuButtonWidget(nullptr),
+        titleWidget(nullptr), // Change to BaseWidget*
+        statusWidget(nullptr), // Change to BaseWidget*
+        menuButtonWidget(nullptr), // Change to BaseWidget*
       animationPhase(0.0f),
       graphAnimationSpeed(1.0f),
       graphAnimationPaused(false),
@@ -33,13 +33,13 @@ AnimatedDashboardScreen::AnimatedDashboardScreen(Adafruit_SSD1306& display)
 
 void AnimatedDashboardScreen::setup() {
     // Create retained mode widgets
-    titleWidget = new LabelWidget(0, 0, width, 12, "System Dashboard");
+        titleWidget = new LabelWidget(0, 0, width, 12, "System Dashboard"); // Ensure correct instantiation
     static_cast<LabelWidget*>(titleWidget)->setAlignment(LabelWidget::Alignment::CENTER);
     
-    statusWidget = new LabelWidget(0, height - 10, width, 10, "Status: Normal");
+        statusWidget = new LabelWidget(0, height - 10, width, 10, "Status: Normal"); // Ensure correct instantiation
     static_cast<LabelWidget*>(statusWidget)->setAlignment(LabelWidget::Alignment::LEFT);
     
-    menuButtonWidget = new ButtonWidget(width - 40, 0, 40, 12, "Menu");
+        menuButtonWidget = new ButtonWidget(width - 40, 0, 40, 12, "Menu"); // Ensure correct instantiation
 }
 
 void AnimatedDashboardScreen::update(unsigned long deltaTime) {

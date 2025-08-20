@@ -2,7 +2,7 @@
 
 ButtonWidget::ButtonWidget(int16_t x, int16_t y, int16_t width, int16_t height,
                          const String& label, bool visible)
-    : Widget(x, y, width, height, visible),
+    : BaseWidget(x, y, width, height, visible),
       label(label),
       state(State::NORMAL),
       onPressCallback(nullptr) {

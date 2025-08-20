@@ -56,9 +56,9 @@ private:
     uint16_t height;
     
     // Retained mode widgets
-    Widget* titleWidget;
-    Widget* statusWidget;
-    Widget* menuButtonWidget;
+    BaseWidget* titleWidget;
+    BaseWidget* statusWidget;
+    BaseWidget* menuButtonWidget;
     
     // Animation state variables
     float animationPhase;

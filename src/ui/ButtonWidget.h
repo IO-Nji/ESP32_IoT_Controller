@@ -1,7 +1,12 @@
+
 #ifndef BUTTON_WIDGET_H
 #define BUTTON_WIDGET_H
 
-#include "Widget.h"
+#include <Arduino.h>
+#include <Adafruit_GFX.h>
+#include "BaseWidget.h"
+
+// ...existing code...
 
 /**
  * @brief A button widget that can be pressed
@@ -9,7 +14,7 @@
  * This widget draws a button with configurable border, text, and state.
  * It can detect and respond to press events.
  */
-class ButtonWidget : public Widget {
+class ButtonWidget : public BaseWidget {
 public:
     /**
      * @brief Button state enumeration

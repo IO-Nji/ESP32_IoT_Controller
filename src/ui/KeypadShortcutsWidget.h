@@ -1,7 +1,12 @@
+
 #ifndef KEYPAD_SHORTCUTS_WIDGET_H
 #define KEYPAD_SHORTCUTS_WIDGET_H
 
-#include "Widget.h"
+#include <Arduino.h>
+#include <Adafruit_GFX.h>
+#include "BaseWidget.h"
+
+// ...existing code...
 
 /**
  * @brief A widget for displaying keypad shortcut buttons
@@ -9,7 +14,7 @@
  * This widget displays shortcut labels for keypad buttons (A,B,C,D,#,*) 
  * and their associated functions at the bottom of the display.
  */
-class KeypadShortcutsWidget : public Widget {
+class KeypadShortcutsWidget : public BaseWidget {
 public:
     // Maximum number of shortcuts
     static const uint8_t MAX_SHORTCUTS = 6;

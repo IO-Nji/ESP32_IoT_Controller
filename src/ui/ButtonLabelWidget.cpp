@@ -5,7 +5,7 @@
 
 ButtonLabelWidget::ButtonLabelWidget(int16_t x, int16_t y, int16_t width, int16_t height,
                              const String& text, uint8_t textSize, bool visible)
-    : Widget(x, y, width, height, visible),
+    : BaseWidget(x, y, width, height, visible),
       text(text),
       textSize(textSize),
       textColor(SSD1306_WHITE) {

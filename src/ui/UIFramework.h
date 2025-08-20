@@ -8,7 +8,7 @@
  */
 
 // Retained mode widgets (persistent objects)
-#include "Widget.h"
+#include "BaseWidget.h"
 #include "LabelWidget.h"
 #include "ButtonWidget.h"
 #include "ButtonLabelWidget.h"
@@ -16,7 +16,6 @@
 #include "KeypadShortcutsWidget.h"
 #include "MenuWidget.h"
 #include "screens/BaseScreen.h"
-#include "screens/ClockScreen.h"
 #include "UIManager.h"
 
 // Immediate mode UI (for dynamic components)

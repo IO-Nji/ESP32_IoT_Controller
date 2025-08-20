@@ -1,14 +1,19 @@
+
 #ifndef LABEL_WIDGET_H
 #define LABEL_WIDGET_H
 
-#include "Widget.h"
+#include <Arduino.h>
+#include <Adafruit_GFX.h>
+#include "BaseWidget.h"
+
+// ...existing code...
 
 /**
  * @brief A widget for displaying text
  * 
  * This widget renders a text string with configurable font and alignment options.
  */
-class LabelWidget : public Widget {
+class LabelWidget : public BaseWidget {
 public:
     /**
      * @brief Text alignment options

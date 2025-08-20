@@ -1,5 +1,6 @@
 #include "MainUI.h"
 #include "../MenuWidget.h"
+#include "../screens/ClockScreen.h"
 
 // Stub implementations for new menu callbacks
 void MainUI::onClockAppSelected(MenuWidget* menu) {
